@@ -1,0 +1,6 @@
+命令: make -C capsule test
+日期: 2026-11-02
+环境: 本机 gcc，-Wall -Wextra -Werror，AddressSanitizer，UndefinedBehaviorSanitizer
+结果: ok 179 checks
+退出码: 0
+说明: 这是电脑上的逻辑测试，不是黄山派串口日志。板端没有执行。
