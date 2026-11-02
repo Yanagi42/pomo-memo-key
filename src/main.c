@@ -17,6 +17,7 @@
 #include "stdio.h"
 #include "string.h"
 #include "drivers/rt_drv_pwm.h"
+#include "capsule.h"
 
 #define APP_NAME        "course_starter"
 #define APP_VERSION     "0.1.0"
@@ -66,6 +67,10 @@ int main(void)
 {
     rt_kprintf("\n[%s] v%s boot ok\n", APP_NAME, APP_VERSION);
     rt_kprintf("Hello world!\n");
+    {
+        int failed = capsule_selftest();
+        rt_kprintf("[%s] capsule selftest %s (%d)\n", APP_NAME, failed ? "FAIL" : "PASS", failed);
+    }
 
     rgb_led_init();
 

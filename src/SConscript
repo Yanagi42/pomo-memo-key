@@ -1,8 +1,8 @@
 import os
 from building import *
 
-# Add source code
-src = Glob('*.c')
-group = DefineGroup('Applications', src, depend = [''])
+cwd = GetCurrentDir()
+src = Glob('*.c') + Glob('../capsule/src/*.c')
+group = DefineGroup('Applications', src, depend = [''], CPPPATH = [os.path.join(cwd, '../capsule/src')])
 
 Return('group')

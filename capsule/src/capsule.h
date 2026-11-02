@@ -131,6 +131,8 @@ bool capsule_memo_truncated(const capsule_t *box);
 size_t capsule_wav_length(const capsule_t *box);
 const uint8_t *capsule_wav_data(const capsule_t *box);
 void capsule_format_status(const capsule_t *box, char *buf, size_t n);
+/* 固件启动时调用的短自检。返回失败条数，0 为通过。 */
+int capsule_selftest(void);
 
 /* 由调用方放在静态存储里。除 vad 和 map 外，字段只由本模块改写。 */
 struct capsule {

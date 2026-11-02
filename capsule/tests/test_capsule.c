@@ -519,6 +519,7 @@ int main(void)
     test_macro_and_pocket();
     test_record();
     test_truncate_and_nospace();
+    CHECK(capsule_selftest() == 0);
     if (failures) {
         fprintf(stderr, "%d failed, %d checks\n", failures, checks);
         return 1;
