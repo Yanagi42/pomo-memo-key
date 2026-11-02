@@ -2,7 +2,8 @@ import os
 from building import *
 
 cwd = GetCurrentDir()
-src = Glob('*.c') + Glob('../capsule/src/*.c')
-group = DefineGroup('Applications', src, depend = [''], CPPPATH = [os.path.join(cwd, '../capsule/src')])
+capsule = os.path.normpath(os.path.join(cwd, '..', 'capsule', 'src'))
+src = Glob(os.path.join(cwd, '*.c')) + Glob(os.path.join(capsule, '*.c'))
+group = DefineGroup('Applications', src, depend = [''], CPPPATH = [capsule])
 
 Return('group')
