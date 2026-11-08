@@ -1,0 +1,40 @@
+* Loaded runtime config ... OK
+* Loaded profile lock 'default' ... OK
+╭─────────────────────────────╮
+│ Activating SiFli-SDK v2.5.1 │
+│ profile=default             │
+╰─────────────────────────────╯
+* Resolved tool plan ... OK
+* Checking environment compatibility ... OK
+[WARN] worktree is dirty; environment export will continue because the compatibility hash is unchanged.
+[ OK ] Updated state file /home/shizuku/.sifli/sifli-sdk-env.json
+* Identified shell ... bash
+* Generating shell export script ... OK
+* Export script ... /tmp/sifli-sdk-export/sdk-env-65dbtg79.sh
+
+Done! SiFli-SDK profile default is active.
+You can now run sdk.py from your project directory.
+0%
+100%
+0%
+100%
+0%
+100%
+0%
+100%
+0%
+14%
+29%
+43%
+58%
+73%
+87%
+100%
+0%
+100%
+0%
+100%
+0%
+100%
+0%
+100%

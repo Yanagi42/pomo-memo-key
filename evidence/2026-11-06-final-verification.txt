@@ -1,0 +1,9 @@
+# 2026-11-06 BLE bonded pairing and final firmware verification
+
+- Host: BlueZ `bluetoothctl`; configured persistent `agent NoInputNoOutput` and `default-agent`, removed the stale device entry, scanned, and paired `POMO_MEMO_HID` successfully.
+- BlueZ reported `Bonded: yes`, `Paired: yes`, `ServicesResolved: yes`, `Pairing successful`. Resolved HID service UUID `00001812-0000-1000-8000-00805f9b34fb`, Report Map `00002a4b`, Report `00002a4d`, and HID Control Point `00002a4c`.
+- Firmware UART subsequently showed `connected conn=0` and `link encrypted` after the host connection. HID Consumer Control reports were not triggered; host volume/player response and reconnect persistence remain untested.
+- Final source (including microphone-open failure UI feedback) built with SiFli SDK v2.5.1 and embedded `main.lcpu`; `sftool write_flash --verify` returned exit code 0. RTS reset booted `v0.4.2`, `capsule selftest PASS (0)`, IMU ready, FT6146 open, UI ready, BLE power event, HID service, and advertising start success.
+- Final 28-second UART capture had zero `i2c_stat` errors and zero `i2c sem timeout` messages. Earlier 35-second capture also had zero of each.
+- Host capsule core regression: `make -C capsule test` -> `ok 163 checks`.
+- Not physically exercised: screen appearance, touch inputs, timer completion/BEEP audibility, microphone capture, TF operations, SPK playback, HID media reports, and disconnect/reconnect behavior.

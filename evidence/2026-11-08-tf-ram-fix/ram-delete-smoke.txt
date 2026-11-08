@@ -1,0 +1,13 @@
+Starting throwaway harness for real handle_ui_commands...
+CHECK 1 PASSED: First click entered CONFIRM? state without deleting recording.
+CHECK 2 PASSED: Second click confirmed deletion and completely cleared RAM recording & state.
+CHECK 3 PASSED: Delete on empty RAM exited confirm safely and reported no-recording feedback.
+CHECK 4 PASSED: Delete command rejected while playback is active; confirm not entered.
+CHECK 5 PASSED: Delete command rejected while recording is active; confirm not entered.
+CHECK 6 PASSED: UI_CMD_TF_PLAY cancels pending delete confirmation without clearing RAM.
+CHECK 7 PASSED: UI_CMD_RECORD cancels pending delete confirmation.
+CHECK 8 PASSED: UI_CMD_TF_NEXT cancels pending delete confirmation.
+
+SUMMARY: All 12 checks passed successfully!
+NOTE: Real function handle_ui_commands from src/main.c was tested under host harness.
+LIMITATION: LVGL visual render (display panel / OLED) is unverified on host (board hardware exclusive to good worker).

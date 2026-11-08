@@ -1,0 +1,151 @@
+SFBL
+Serial:c2,Chip:4,Package:3,Rev:3  Reason:00000000
+
+ \ | /
+- SiFli Corporation
+ / | \     build on Nov  6 2026, 2.5.1 build 421126d9
+ 2020 - 2022 Copyright by SiFli team
+aw32001_init ok,  time consum: 0.00 ms.
+mount /dev sucess
+[I/drv.rtc] PSCLR=0x80000100 DivAI=128 DivAF=0 B=256
+[I/drv.rtc] RTC use LXT RTC_CR=00000001
+
+[I/drv.rtc] Init RTC, wake = 0
+
+[I/drv.audprc] init 00 ADC_PATH_CFG0 0x606
+
+[I/drv.audprc] HAL_AUDPRC_Init res 0
+
+[I/drv.audcodec] HAL_AUDCODEC_Init res 0
+
+[I/drv.rgb] rgbled register success, supporting 1 LEDs
+[32;22m[I/FAL] Flash Abstraction Layer (V0.5.99) initialize success.[0m
+[32;22m[I/FAL] The FAL MTD NOR device (dfu) created successfully[0m
+[32;22m[I/FAL] The FAL MTD NOR device (ble) created successfully[0m
+call par CFG1(3313)
+fc 9, xtal 2000, pll 2095
+call par CFG1(3313)
+fc 7, xtal 2000, pll 1682
+
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+msh />[I/sensor] rt_sensor init success
+[32m[I/sensor.st.lsm6dsl] sensor init success[0m
+[0m[D/sensor.st.lsm6dsl] set mode to POLLING[0m
+[0m[D/sensor.st.lsm6dsl] set power normal[0m
+[0m[D/sensor.st.lsm6dsl] acce set range 2000[0m
+[0m[D/sensor.st.lsm6dsl] acce set odr 100[0m
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] using saved five-pose calibration
+[I/DBG] [NONE] -> [OPENING]
+[I/DBG] open
+[I/DBG] drv_gpu opened.
+[I/DBG] HW open
+[I/DBG] Try registered LCD driver...
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+[I/DBG] Found lcd co5300 id:331100h
+[I/DBG] HW open done.
+[I/DBG] [OPENING] -> [INITIALIZED]
+[I/DBG] open done.
+[I/DBG] drv_lcd_fb_init
+[I/DBG] drv_lcd_fb_init done.
+[course_starter] status=未知 00:10 x=-0.037 y=0.024 z=-0.988 muted=0 recording=0
+[course_starter] UI ready: LCD display only, no touch input
+[I/DBG] Auto turn on display.
+[I/DBG] set brightness 50
+[I/DBG] display on
+[I/DBG] [INITIALIZED] -> [ON]
+[course_starter] status=平放 00:10 x=-0.034 y=0.025 z=-0.983 muted=0 recording=0
+[course_starter] status=直立 00:10 x=0.129 y=-1.104 z=0.113 muted=0 recording=0
+[course_starter] status=直立 00:09 x=0.064 y=-0.998 z=-0.066 muted=0 recording=0
+[course_starter] status=直立 00:08 x=0.041 y=-1.012 z=0.013 muted=0 recording=0
+[course_starter] status=直立 00:07 x=0.064 y=-1.021 z=-0.022 muted=0 recording=0
+[course_starter] status=直立 00:06 x=0.034 y=-0.992 z=-0.019 muted=0 recording=0
+[course_starter] status=直立 00:05 x=0.033 y=-1.004 z=0.013 muted=0 recording=0
+[course_starter] status=直立 00:04 x=0.029 y=-0.993 z=0.021 muted=0 recording=0
+[course_starter] status=直立 00:03 x=0.024 y=-0.983 z=0.020 muted=0 recording=0
+[course_starter] status=直立 00:02 x=0.003 y=-0.983 z=-0.014 muted=0 recording=0
+[course_starter] status=直立 00:01 x=0.026 y=-0.997 z=0.020 muted=0 recording=0
+[I/drv.audprc] set g_eq_enable=1
+[I/drv.audcodec] dac set volume: prc=0 codec=-28
+
+[I/drv.audcodec] codec dac mute set:1
+
+[I/drv.audprc] samplerate = 16000, select voice eq
+
+[I/drv.audprc] -----tx dma size = 960
+[I/drv.audcodec] pll config state:1, samplerate:0 
+
+sifli_aw8155 to do power handle 
+sifli_aw8155_start,mode:1 42
+[I/drv.audcodec] codec dac mute set:0
+
+[I/drv.audcodec] dac set volume: prc=0 codec=-8
+
+sifli_aw8155_stop 
+[I/drv.audcodec] codec dac mute set:1
+
+[I/drv.audcodec] bf0_audio_stop 0x100
+
+[I/drv.audcodec] audcodec close dac
+[I/drv.audcodec] bf0_audio_stop 0x100 done
+
+[I/drv.audprc] bf0_audio_stop 0x100
+
+[I/drv.audprc] audprc close adc/dac
+[I/drv.audprc] bf0_audio_stop 0x100 done
+
+PLL disable
+[course_starter] timer beep emitted
+[course_starter] status=直立 00:00 x=0.043 y=-1.004 z=0.026 muted=0 recording=0
+[course_starter] status=平放 00:00 x=-0.013 y=-0.001 z=-0.986 muted=0 recording=0
+[course_starter] status=直立 00:10 x=-0.073 y=-0.940 z=-0.236 muted=0 recording=0
+[course_starter] status=直立 00:09 x=-0.020 y=-0.982 z=-0.164 muted=0 recording=0
+[course_starter] status=直立 00:08 x=-0.030 y=-0.959 z=-0.152 muted=0 recording=0
+[course_starter] status=直立 00:07 x=-0.003 y=-0.969 z=-0.156 muted=0 recording=0
+[course_starter] status=直立 00:06 x=0.009 y=-1.004 z=-0.130 muted=0 recording=0
+[course_starter] status=直立 00:05 x=-0.019 y=-0.984 z=-0.145 muted=0 recording=0
+[course_starter] status=直立 00:04 x=-0.017 y=-0.991 z=-0.151 muted=0 recording=0
+[course_starter] status=直立 00:03 x=-0.008 y=-1.019 z=-0.112 muted=0 recording=0
+[course_starter] status=直立 00:02 x=0.010 y=-1.001 z=-0.125 muted=0 recording=0
+[course_starter] status=直立 00:01 x=0.000 y=-0.983 z=-0.101 muted=0 recording=0
+[I/drv.audprc] set g_eq_enable=1
+[I/drv.audcodec] dac set volume: prc=0 codec=-8
+
+[I/drv.audcodec] codec dac mute set:1
+
+[I/drv.audprc] samplerate = 16000, select voice eq
+
+[I/drv.audprc] -----tx dma size = 960
+[I/drv.audcodec] pll config state:1, samplerate:0 
+
+sifli_aw8155 to do power handle 
+sifli_aw8155_start,mode:1 42
+[I/drv.audcodec] codec dac mute set:0
+
+[I/drv.audcodec] dac set volume: prc=0 codec=-8
+
+sifli_aw8155_stop 
+[I/drv.audcodec] codec dac mute set:1
+
+[I/drv.audcodec] bf0_audio_stop 0x100
+
+[I/drv.audcodec] audcodec close dac
+[I/drv.audcodec] bf0_audio_stop 0x100 done
+
+[I/drv.audprc] bf0_audio_stop 0x100
+
+[I/drv.audprc] audprc close adc/dac
+[I/drv.audprc] bf0_audio_stop 0x100 done
+
+PLL disable
+[course_starter] timer beep emitted
+[course_starter] status=直立 00:00 x=0.026 y=-1.010 z=-0.104 muted=0 recording=0
+[course_starter] status=平放 00:00 x=-0.076 y=-0.417 z=-0.899 muted=0 recording=0

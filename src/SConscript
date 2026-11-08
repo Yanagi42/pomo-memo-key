@@ -4,6 +4,7 @@ from building import *
 cwd = GetCurrentDir()
 capsule = os.path.normpath(os.path.join(cwd, '..', 'capsule', 'src'))
 src = Glob(os.path.join(cwd, '*.c')) + Glob(os.path.join(capsule, '*.c'))
-group = DefineGroup('Applications', src, depend = [''], CPPPATH = [capsule])
+sensor_include = os.path.join(os.getenv('SIFLI_SDK'), 'customer', 'peripherals', 'sensor', 'LSM6DSL')
+group = DefineGroup('Applications', src, depend = [''], CPPPATH = [capsule, sensor_include])
 
 Return('group')

@@ -1,0 +1,18 @@
+固定标定版最终启动证据
+
+固件：v0.4.1
+SDK：SiFli v2.5.1 build 421126d9
+板型：sf32lb52-lchspi-ulp
+串口：/dev/ttyUSB0，1000000 baud
+
+烧录：sftool write_flash --verify 成功，bootloader/main/ftab 均完成校验。
+
+关键启动输出：
+[course_starter] v0.4.1 boot ok
+[course_starter] capsule selftest PASS (0)
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] using saved five-pose calibration
+[course_starter] status=未知 25:00 x=-0.010 y=0.004 z=-0.985 muted=0 recording=0
+[course_starter] status=平放 25:00 x=-0.009 y=0.003 z=-0.984 muted=0 recording=0
+
+结果：v0.4.1 已成功烧录并启动；未再次进入五姿态标定流程，固化参照生效。

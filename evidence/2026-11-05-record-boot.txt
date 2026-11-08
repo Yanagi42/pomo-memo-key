@@ -1,0 +1,17 @@
+KEY2录音固件启动证据
+
+固件：v0.4.0
+SDK：SiFli v2.5.1 build 421126d9
+板型：sf32lb52-lchspi-ulp
+串口：/dev/ttyUSB0，1000000 baud
+烧录：sftool write_flash --verify 成功
+
+启动输出关键行：
+[course_starter] v0.4.0 boot ok
+[course_starter] capsule selftest PASS (0)
+[I/sensor.st.lsm6dsl] sensor init success
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] calibrate five poses in order; press KEY2 for each pose
+[course_starter] place STAND still, then press KEY2 to capture
+
+结果：录音固件构建、烧录、启动、自检和IMU初始化通过；五姿态标定与KEY2录音实物验收待执行。

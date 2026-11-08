@@ -1,0 +1,9 @@
+# 2026-11-06 UI black-screen recovery build
+
+- Source changes: use LVGL's rotated logical resolution for the 3x3 panel dimensions; preserve the last visible pose and unhide the UI if a hidden face-down page is followed by an `UNKNOWN` pose.
+- Build: `cd project && scons --board=sf32lb52-lchspi-ulp -j8` — exit code 0.
+- Flash: `sftool -p /dev/ttyUSB0 -c SF32LB52 -m nor config sftool_param.json` from the build directory — exit code 0; generated config has `verify: true`.
+- UART boot: `v0.4.2 boot ok`, `capsule selftest PASS (0)`, IMU ready, UI ready; display driver reports brightness 50 and `display on`.
+- Startup status was flat; no face-down status appeared in the captured startup segment.
+- Repeated I2C transfer errors and timeouts continue during FT6146/IMU operation. These may still corrupt pose samples; W5 concurrency remains unverified.
+- The user reported the screen remains dark after this flash. Physical display recovery is **not confirmed**; no full feature acceptance was run.

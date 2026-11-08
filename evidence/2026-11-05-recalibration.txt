@@ -1,0 +1,219 @@
+--- Miniterm on /dev/ttyUSB0  1000000,8,N,1 ---
+--- Quit: Ctrl+] | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
+
+--- exit ---
+SFBL
+Serial:c2,Chip:4,Package:3,Rev:3  Reason:00000000
+
+ \ | /
+- SiFli Corporation
+ / | \     build on Nov  5 2026, 2.5.1 build 421126d9
+ 2020 - 2022 Copyright by SiFli team
+aw32001_init ok,  time consum: 0.00 ms.
+mount /dev sucess
+[I/drv.rtc] PSCLR=0x80000100 DivAI=128 DivAF=0 B=256
+[I/drv.rtc] RTC use LXT RTC_CR=00000001
+
+[I/drv.rtc] Init RTC, wake = 0
+
+[I/drv.audprc] init 00 ADC_PATH_CFG0 0x606
+
+[I/drv.audprc] HAL_AUDPRC_Init res 0
+
+[I/drv.audcodec] HAL_AUDCODEC_Init res 0
+
+[I/drv.rgb] rgbled register success, supporting 1 LEDs
+[32;22m[I/FAL] Flash Abstraction Layer (V0.5.99) initialize success.[0m
+[32;22m[I/FAL] The FAL MTD NOR device (dfu) created successfully[0m
+[32;22m[I/FAL] The FAL MTD NOR device (ble) created successfully[0m
+call par CFG1(3313)
+fc 9, xtal 2000, pll 2095
+call par CFG1(3313)
+fc 7, xtal 2000, pll 1682
+
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+msh />[I/sensor] rt_sensor init success
+[32m[I/sensor.st.lsm6dsl] sensor init success[0m
+[0m[D/sensor.st.lsm6dsl] set mode to POLLING[0m
+[0m[D/sensor.st.lsm6dsl] set power normal[0m
+[0m[D/sensor.st.lsm6dsl] acce set range 2000[0m
+[0m[D/sensor.st.lsm6dsl] acce set odr 100[0m
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] using saved five-pose calibration
+[I/DBG] [NONE] -> [OPENING]
+[I/DBG] open
+[I/DBG] drv_gpu opened.
+[I/DBG] HW open
+[I/DBG] Try registered LCD driver...
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+[I/DBG] Found lcd co5300 id:331100h
+[I/DBG] HW open done.
+[I/DBG] [OPENING] -> [INITIALIZED]
+[I/DBG] open done.
+[I/DBG] drv_lcd_fb_init
+[I/DBG] drv_lcd_fb_init done.
+[course_starter] status=未知 25:00 x=0.036 y=0.029 z=-0.984 muted=0 recording=0
+[course_starter] UI ready: LCD display only, no touch input
+[I/DBG] Auto turn on display.
+[I/DBG] set brightness 50
+[I/DBG] display on
+[I/DBG] [INITIALIZED] -> [ON]
+[course_starter] status=平放 25:00 x=0.034 y=0.033 z=-0.983 muted=0 recording=0
+[course_starter] status=右侧 25:00 x=-0.941 y=0.198 z=-0.060 muted=0 recording=0
+[course_starter] status=未知 25:00 x=-0.263 y=0.960 z=-0.167 muted=0 recording=0
+[course_starter] status=平放 25:00 x=-0.422 y=0.185 z=-0.759 muted=0 recording=0
+[course_starter] status=未知 25:00 x=-0.552 y=0.453 z=-0.881 muted=0 recording=0
+[course_starter] status=平放 25:00 x=-0.007 y=0.051 z=-0.986 muted=0 recording=0
+[course_starter] status=右侧 25:00 x=-1.108 y=0.040 z=-0.163 muted=0 recording=0
+[course_starter] status=直立 25:00 x=-0.031 y=-1.032 z=0.162 muted=0 recording=0
+[course_starter] status=直立 24:59 x=0.074 y=-0.982 z=0.164 muted=0 recording=0
+[course_starter] status=直立 24:58 x=-0.054 y=0.928 z=-0.209 muted=0 recording=0
+[course_starter] status=未知 24:58 x=-0.104 y=0.958 z=-0.140 muted=0 recording=0
+[course_starter] status=扣下 24:58 x=0.009 y=-0.174 z=0.999 muted=1 recording=0
+[course_starter] status=未知 24:58 x=-0.559 y=0.525 z=-0.559 muted=0 recording=0
+[course_starter] status=右侧 24:58 x=-0.990 y=-0.013 z=-0.097 muted=0 recording=0
+[course_starter] status=平放 24:58 x=-0.073 y=0.177 z=-1.031 muted=0 recording=0
+SFBL
+Serial:c2,Chip:4,Package:3,Rev:3  Reason:00000000
+
+ \ | /
+- SiFli Corporation
+ / | \     build on Nov  5 2026, 2.5.1 build 421126d9
+ 2020 - 2022 Copyright by SiFli team
+aw32001_init ok,  time consum: 0.00 ms.
+mount /dev sucess
+[I/drv.rtc] PSCLR=0x80000100 DivAI=128 DivAF=0 B=256
+[I/drv.rtc] RTC use LXT RTC_CR=00000001
+
+[I/drv.rtc] Init RTC, wake = 0
+
+[I/drv.audprc] init 00 ADC_PATH_CFG0 0x606
+
+[I/drv.audprc] HAL_AUDPRC_Init res 0
+
+[I/drv.audcodec] HAL_AUDCODEC_Init res 0
+
+[I/drv.rgb] rgbled register success, supporting 1 LEDs
+[32;22m[I/FAL] Flash Abstraction Layer (V0.5.99) initialize success.[0m
+[32;22m[I/FAL] The FAL MTD NOR device (dfu) created successfully[0m
+[32;22m[I/FAL] The FAL MTD NOR device (ble) created successfully[0m
+call par CFG1(3313)
+fc 9, xtal 2000, pll 2095
+call par CFG1(3313)
+fc 7, xtal 2000, pll 1682
+
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+msh />[I/sensor] rt_sensor init success
+[32m[I/sensor.st.lsm6dsl] sensor init success[0m
+[0m[D/sensor.st.lsm6dsl] set mode to POLLING[0m
+[0m[D/sensor.st.lsm6dsl] set power normal[0m
+[0m[D/sensor.st.lsm6dsl] acce set range 2000[0m
+[0m[D/sensor.st.lsm6dsl] acce set odr 100[0m
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] using saved five-pose calibration
+[I/DBG] [NONE] -> [OPENING]
+[I/DBG] open
+[I/DBG] drv_gpu opened.
+[I/DBG] HW open
+[I/DBG] Try registered LCD driver...
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+[I/DBG] Found lcd co5300 id:331100h
+[I/DBG] HW open done.
+[I/DBG] [OPENING] -> [INITIALIZED]
+[I/DBG] open done.
+[I/DBG] drv_lcd_fb_init
+[I/DBG] drv_lcd_fb_init done.
+[course_starter] status=未知 25:00 x=0.012 y=-0.012 z=-0.974 muted=0 recording=0
+[course_starter] UI ready: LCD display only, no touch input
+[I/DBG] Auto turn on display.
+[I/DBG] set brightness 50
+[I/DBG] display on
+[I/DBG] [INITIALIZED] -> [ON]
+[course_starter] status=平放 25:00 x=0.020 y=0.038 z=-1.000 muted=0 recording=0
+[course_starter] status=直立 25:00 x=-0.028 y=-1.007 z=-0.137 muted=0 recording=0
+[course_starter] status=直立 24:59 x=-0.067 y=-1.001 z=-0.049 muted=0 recording=0
+[course_starter] status=直立 24:58 x=-0.133 y=-0.994 z=-0.038 muted=0 recording=0
+[course_starter] status=直立 24:57 x=-0.119 y=-1.002 z=-0.001 muted=0 recording=0
+[course_starter] status=直立 24:56 x=-0.157 y=-0.993 z=0.004 muted=0 recording=0
+[course_starter] status=直立 24:55 x=-0.151 y=-0.992 z=0.005 muted=0 recording=0
+[course_starter] status=平放 24:55 x=-0.024 y=-0.147 z=-0.947 muted=0 recording=0
+[course_starter] status=直立 24:55 x=0.277 y=-0.978 z=0.147 muted=0 recording=0
+[course_starter] status=直立 24:54 x=0.169 y=-1.048 z=0.137 muted=0 recording=0
+[course_starter] status=直立 24:53 x=-0.022 y=-0.966 z=0.323 muted=0 recording=0
+[course_starter] status=直立 24:52 x=0.011 y=-0.873 z=0.160 muted=0 recording=0
+[course_starter] status=直立 24:51 x=-0.019 y=-0.975 z=0.229 muted=0 recording=0
+[course_starter] status=直立 24:50 x=-0.077 y=-0.970 z=0.240 muted=0 recording=0
+[course_starter] status=直立 24:49 x=-0.233 y=-0.883 z=-0.466 muted=0 recording=0
+[course_starter] status=平放 24:49 x=-0.171 y=-0.177 z=-0.944 muted=0 recording=0
+[course_starter] status=直立 24:49 x=-0.015 y=-1.018 z=0.115 muted=0 recording=0
+[course_starter] status=直立 24:48 x=0.024 y=-0.974 z=0.116 muted=0 recording=0
+[course_starter] status=直立 24:47 x=-0.126 y=-0.972 z=0.215 muted=0 recording=0
+[course_starter] status=直立 24:46 x=-0.147 y=-0.976 z=0.159 muted=0 recording=0
+[course_starter] status=直立 24:45 x=-0.140 y=-0.981 z=0.175 muted=0 recording=0
+[course_starter] status=直立 24:44 x=-0.143 y=-0.977 z=0.169 muted=0 recording=0
+[course_starter] status=直立 24:43 x=-0.201 y=-0.674 z=-0.682 muted=0 recording=0
+[course_starter] status=平放 24:43 x=-0.007 y=-0.026 z=-0.985 muted=0 recording=0
+[course_starter] status=未知 24:43 x=-0.050 y=0.752 z=-0.174 muted=0 recording=0
+[course_starter] status=平放 24:43 x=-0.206 y=-0.301 z=-0.891 muted=0 recording=0
+[course_starter] status=未知 24:43 x=-0.176 y=1.103 z=0.095 muted=0 recording=0
+[course_starter] status=平放 24:43 x=-0.075 y=-0.031 z=-0.610 muted=0 recording=0
+[course_starter] status=未知 24:43 x=0.058 y=0.897 z=0.057 muted=0 recording=0
+[course_starter] status=平放 24:43 x=0.022 y=0.009 z=-0.956 muted=0 recording=0
+[course_starter] status=未知 24:43 x=-0.260 y=1.006 z=-0.069 muted=0 recording=0
+[course_starter] status=平放 24:43 x=0.026 y=0.147 z=-0.932 muted=0 recording=0
+SFBL
+Serial:c2,Chip:4,Package:3,Rev:3  Reason:00000000
+
+ \ | /
+- SiFli Corporation
+ / | \     build on Nov  5 2026, 2.5.1 build 421126d9
+ 2020 - 2022 Copyright by SiFli team
+aw32001_init ok,  time consum: 0.00 ms.
+mount /dev sucess
+[I/drv.rtc] PSCLR=0x80000100 DivAI=128 DivAF=0 B=256
+[I/drv.rtc] RTC use LXT RTC_CR=00000001
+
+[I/drv.rtc] Init RTC, wake = 0
+
+[I/drv.audprc] init 00 ADC_PATH_CFG0 0x606
+
+[I/drv.audprc] HAL_AUDPRC_Init res 0
+
+[I/drv.audcodec] HAL_AUDCODEC_Init res 0
+
+[I/drv.rgb] rgbled register success, supporting 1 LEDs
+[32;22m[I/FAL] Flash Abstraction Layer (V0.5.99) initialize success.[0m
+[32;22m[I/FAL] The FAL MTD NOR device (dfu) created successfully[0m
+[32;22m[I/FAL] The FAL MTD NOR device (ble) created successfully[0m
+call par CFG1(3313)
+fc 9, xtal 2000, pll 2097
+call par CFG1(3313)
+fc 7, xtal 2000, pll 1684
+
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+msh />[I/sensor] rt_sensor init success
+[32m[I/sensor.st.lsm6dsl] sensor init success[0m
+[0m[D/sensor.st.lsm6dsl] set mode to POLLING[0m
+[0m[D/sensor.st.lsm6dsl] set power normal[0m
+[0m[D/sensor.st.lsm6dsl] acce set range 2000[0m
+[0m[D/sensor.st.lsm6dsl] acce set odr 100[0m
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] guided calibration mode
+[course_starter] 请摆放：直立，保持静止后按 KEY2 确认

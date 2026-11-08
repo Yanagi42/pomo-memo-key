@@ -1,0 +1,10 @@
+# 2026-11-06 white-screen fix and current boot
+
+- User symptom on the previously flashed firmware: white screen with only `Text` at the top.
+- Source diagnosis: `ui_pose_label` was created without text; all page controls are hidden unless pose changes from UNKNOWN; the 3×3 scroll page had no explicit size/initial offset, so panel children could stay outside the screen viewport.
+- Fix: size the page to three logical display widths/heights and offset it to the center cell; initialize and update the visible pose label; use LCD brightness 0 for FACE_DOWN and restore brightness on the next known pose.
+- Build: `scons --board=sf32lb52-lchspi-ulp -j8` exit code 0.
+- Flash: `sftool -p /dev/ttyUSB0 -c SF32LB52 -m nor write_flash --verify bootloader/bootloader.bin@0x12010000 main.bin@0x12020000 ftab/ftab.bin@0x12000000` exit code 0.
+- Reset: UART RTS high/low pulse at 1,000,000 baud.
+- Serial after reset: `boot ok`, `capsule selftest PASS (0)`, `IMU ready`, FT6146 ID and open succeeded, `UI ready`, display on. During the 22-second capture: 0 `i2c_stat` errors, 0 `i2c sem timeout` messages. Pose output progressed UNKNOWN → FLAT.
+- Physical visual confirmation and touchscreen click have not been observed by the host; user should check the new display and tap a control for final UI confirmation.

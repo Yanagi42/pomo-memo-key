@@ -1,0 +1,8 @@
+# 2026-11-06 UART reset and boot record
+
+- The board has no reset button. Sent the RT-Thread MSH `reboot` command over `/dev/ttyUSB0` at 1,000,000 baud.
+- Firmware: v0.4.2, SiFli SDK v2.5.1 build 421126d9.
+- Boot result: `[course_starter] v0.4.2 boot ok`; `capsule selftest PASS (0)`; `IMU ready: bus=i2c1 addr=0x6a sample=100ms`; `UI ready: interactive timer, touch enabled by SDK input driver`; saved five-pose calibration loaded.
+- TF result: `TF library RAM fallback` (no TF card detected).
+- Startup warnings: two I2C transfer errors (`i2c_stat:20`, `i2c_errcode=24`) followed by bus recovery (`reset and send 9 clks`) during UI/IMU startup. Touch/IMU concurrent stability remains unverified; include in W5.
+- User feature acceptance W1–W5 has not yet been performed.

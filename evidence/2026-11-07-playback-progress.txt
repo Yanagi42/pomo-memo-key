@@ -1,0 +1,7 @@
+# Playback status and percentage progress — 2026-11-07
+
+- Recorder page has `PLAYBACK READY`, `PLAYING N%`, `PLAYBACK COMPLETE`, and `PLAYBACK FAILED` plus a 0–100 LVGL progress bar. Text and bar only update when displayed state/value changes.
+- PLAY runs in a `play_memo` worker so main/UI updates continue during audio. Progress advances by audio chunks accepted and reaches 100% after flush. Duplicate PLAY and PLAY during recording are rejected; recording start, FILE changes, and DELETE are rejected while playback owns the shared WAV buffer/file.
+- Build: SiFli SDK v2.5.1 SCons completed successfully; `make -C capsule test` -> `ok 163 checks`.
+- Flash: `sftool ... write_flash --verify` returned exit code 0. RTS reset UART showed `capsule selftest PASS (0)`, IMU ready, FT6146 open, UI ready, BLE power event and advertising start. A 28-second capture had zero I2C errors and zero I2C semaphore timeouts.
+- Actual PLAY touchscreen action, visible progress changes during a recording, and audible speaker output were not tested. Progress reflects audio-server accepted PCM chunks, with completion reported after audio flush; physical playback timing remains to be confirmed.

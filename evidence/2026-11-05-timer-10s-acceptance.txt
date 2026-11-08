@@ -1,0 +1,43 @@
+十秒计时板端验收
+
+Firmware: v0.4.2 test build, CONFIG_POMO_TEST_10S=y
+SDK: SiFli v2.5.1 build 421126d9
+Board: sf32lb52-lchspi-ulp
+Port: /dev/ttyUSB0, 1000000 baud
+Flash: sftool write_flash --verify passed.
+
+Host logic:
+make -C capsule test -> ok 179 checks
+
+Board output:
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] using saved five-pose calibration
+[course_starter] status=未知 00:10 x=-0.039 y=-0.999 z=-0.052 muted=0 recording=0
+[course_starter] status=直立 00:10 x=-0.039 y=-0.999 z=-0.052 muted=0 recording=0
+[course_starter] status=直立 00:09 x=-0.039 y=-0.999 z=-0.052 muted=0 recording=0
+[course_starter] status=直立 00:01 x=-0.039 y=-0.999 z=-0.052 muted=0 recording=0
+[course_starter] timer beep emitted
+[course_starter] status=直立 00:00 x=-0.039 y=-0.999 z=-0.052 muted=0 recording=0
+
+The test-only mode uses a compile-time 10-second duration and simulated calibrated standing samples. Production configuration remains 25 minutes; this test build was not retained as the final firmware.
+
+Production restore:
+- Removed `CONFIG_POMO_TEST_10S` from `project/proj.conf`.
+- Rebuilt and flashed with `sftool write_flash --verify`.
+- Generated configuration: `# CONFIG_POMO_TEST_10S is not set`.
+- Board boot output: `status=未知 25:00 ...`, then `status=平放 25:00 ...`.
+
+TC-B8/B9 board acceptance log (user-run; firmware v0.4.2, production timer):
+[course_starter] status=左侧 24:58 ...
+[course_starter] macro=音量加 seq=1
+[course_starter] status=右侧 24:58 ...
+[course_starter] macro=下一首 seq=2
+[course_starter] macro=麦克风静音 seq=3
+[course_starter] status=左侧 24:56 ...
+[course_starter] recording started
+[course_starter] status=未知 24:56 ... recording=1
+[course_starter] recording stopped: status=2 wav=10924 bytes truncated=0
+
+Result: TC-B8 passed for left/right short presses and long press; TC-B9 passed for away-from-desk side placement entering recording, release continuing, and second press stopping with saved WAV. User reports the board behaved normally.

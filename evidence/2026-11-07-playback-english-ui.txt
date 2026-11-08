@@ -1,0 +1,8 @@
+# 2026-11-07 RAM playback and English UI
+
+- Source changes: PLAY now prefers the latest completed RAM WAV (`capsule_wav_data`) and falls back to the selected TF WAV when no latest RAM recording exists. Shared playback validates WAV data, opens `AUDIO_TYPE_LOCAL_MUSIC`/`AUDIO_TX`, sets private volume 15, retries audio backpressure, and logs open/write/flush failures.
+- UI changes: all visible board UI strings are English; CJK SimSun font configuration was removed from `project/proj.conf`. The six media labels, BLE status, pose labels, timer labels, recorder labels, TF status, and macro names no longer depend on Chinese glyphs.
+- Build: SDK v2.5.1 SCons build completed; embedded LCPU image remained present. Host `make -C capsule test` returned `ok 163 checks`.
+- Flash: `sftool ... write_flash --verify` returned exit code 0 after restoring `/dev/ttyUSB0` ACL.
+- RTS reset UART: `capsule selftest PASS (0)`, IMU ready, FT6146 open, UI ready, BLE power event, HID advertising start; 28-second capture had zero I2C errors and zero I2C semaphore timeouts.
+- Physical microphone recording, PLAY tap, speaker audibility, and visual confirmation of English glyphs were not performed. The new playback path is not claimed audible until the user verifies it on the SPK output.

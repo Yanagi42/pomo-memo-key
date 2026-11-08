@@ -1,0 +1,30 @@
+version: 2.10.0
+installed: 2026-11-05T08:38:31Z
+claude: no
+skills:
+  - flow-architect
+  - flow-break
+  - flow-close
+  - flow-grill
+  - flow-implement
+  - flow-retro
+  - flow-spec
+  - flow-start
+  - flow-verify
+managed:
+  1056250117 .agents/agents/security-reviewer.md
+  2525051741 .agents/agents/workflow-reviewer.md
+  2250345377 .agents/skills/flow-architect/SKILL.md
+  3446175969 .agents/skills/flow-break/SKILL.md
+  3027942443 .agents/skills/flow-close/SKILL.md
+  3193970523 .agents/skills/flow-grill/SKILL.md
+  1529136127 .agents/skills/flow-implement/SKILL.md
+  4140799125 .agents/skills/flow-retro/SKILL.md
+  3798833588 .agents/skills/flow-spec/SKILL.md
+  3477140599 .agents/skills/flow-start/SKILL.md
+  2912658814 .agents/skills/flow-verify/SKILL.md
+  3214995136 .workflow/CONVENTIONS.md
+  1681938684 .workflow/STYLE.md
+  4084749002 .workflow/bin/workflow
+  1438139708 .workflow/bin/workflow-core.py
+  3478117801 AGENTS.md#workflow-block

@@ -1,0 +1,6 @@
+# 2026-11-06 BLE bonded pairing
+
+- Host: BlueZ `bluetoothctl`, configured `agent NoInputNoOutput` and `default-agent`.
+- Discovered `POMO_MEMO_HID` and completed `pair` successfully. BlueZ reported `Bonded: yes`, `Paired: yes`, `ServicesResolved: yes`, `Pairing successful`.
+- Discovered HID service UUID `00001812-0000-1000-8000-00805f9b34fb`, Report Map `00002a4b`, Report `00002a4d`, and HID Control Point `00002a4c`.
+- This verifies Just Works bonding and HID service discovery. No media command was triggered, so Consumer Control report delivery, host volume/player response, disconnect/reconnect behavior, and physical touch UI remain unverified.

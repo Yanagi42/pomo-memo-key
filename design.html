@@ -1,0 +1,1456 @@
+<!DOCTYPE html>
+
+<html lang="zh-CN"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>闪念胶囊 Pomo Memo Key - 交互原型</title>
+<!-- Montserrat font -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;1,700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+  tailwind.config = {
+    darkMode: "class",
+    theme: {
+      extend: {
+        colors: {
+          primary: "#006194",
+          "primary-container": "#007bb9",
+          "surface-container-low": "#f2f4f6",
+          "surface-container": "#eceef0"
+        },
+        fontFamily: {
+          sans: ['Montserrat', '-apple-system', 'BlinkMacSystemFont', '"Segoe UI"', 'Roboto', 'sans-serif']
+        }
+      }
+    }
+  }
+</script>
+<style>
+    /* ==================== 设计令牌：亮色（默认） ====================
+       一处定义，亮/暗两套取值；所有拟物阴影都收敛在小范围硬投影，
+       不再使用大半径模糊，避免按钮周围出现灰色晕染。 */
+    :root {
+      color-scheme: light;
+      --page-bg: #e2e8f0;
+
+      --chrome-bg: rgba(255, 255, 255, 0.95);
+      --chrome-border: rgba(226, 232, 240, 0.8);
+
+      --frame-top: #ffffff;
+      --frame-bottom: #f1f5f9;
+      --frame-border: rgba(255, 255, 255, 0.85);
+      --frame-shadow:
+        0 10px 24px -12px rgba(15, 23, 42, 0.30),
+        0 2px 6px -2px rgba(15, 23, 42, 0.10),
+        inset 0 1px 1px rgba(255, 255, 255, 1),
+        inset 0 -1px 1px rgba(148, 163, 184, 0.35);
+
+      --screen-bg: #f8fafc;
+      --screen-shadow:
+        inset 0 1px 2px rgba(15, 23, 42, 0.10),
+        inset 0 0 0 1px rgba(203, 213, 225, 0.7);
+
+      --recessed-top: #edf2f7;
+      --recessed-bottom: #f6f8fa;
+      --recessed-border: rgba(203, 213, 225, 0.8);
+      --recessed-shadow:
+        inset 0 2px 4px rgba(15, 23, 42, 0.10),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.9);
+
+      --btn-top: #ffffff;
+      --btn-bottom: #f2f5f8;
+      --btn-border: rgba(226, 232, 240, 0.9);
+      --btn-shadow:
+        0 1px 0 rgba(15, 23, 42, 0.05),
+        0 2px 3px -1px rgba(15, 23, 42, 0.12),
+        inset 0 1px 0 rgba(255, 255, 255, 0.95);
+      --btn-shadow-hover:
+        0 1px 0 rgba(15, 23, 42, 0.06),
+        0 3px 5px -2px rgba(15, 23, 42, 0.18),
+        inset 0 1px 0 rgba(255, 255, 255, 1);
+      --btn-shadow-active:
+        inset 0 2px 4px rgba(15, 23, 42, 0.18),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.4),
+        0 1px 1px rgba(15, 23, 42, 0.05);
+      --btn-face-active: #e8edf3;
+
+      --primary-top: #0d8ed6;
+      --primary-bottom: #0369a1;
+      --primary-border: rgba(56, 189, 248, 0.45);
+      --primary-shadow:
+        0 1px 0 rgba(3, 44, 67, 0.18),
+        0 2px 4px -1px rgba(2, 132, 199, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.28);
+      --primary-shadow-hover:
+        0 1px 0 rgba(3, 44, 67, 0.2),
+        0 3px 6px -2px rgba(2, 132, 199, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.32);
+      --primary-shadow-active:
+        inset 0 2px 5px rgba(2, 44, 67, 0.55),
+        0 1px 1px rgba(2, 44, 67, 0.20);
+
+      --danger-top: #ef3b5b;
+      --danger-bottom: #be123c;
+      --danger-border: rgba(251, 113, 133, 0.4);
+      --danger-shadow:
+        0 1px 0 rgba(76, 5, 25, 0.18),
+        0 2px 4px -1px rgba(225, 29, 72, 0.38),
+        inset 0 1px 0 rgba(255, 255, 255, 0.26);
+      --danger-shadow-active:
+        inset 0 2px 5px rgba(76, 5, 25, 0.55),
+        0 1px 1px rgba(76, 5, 25, 0.20);
+
+      --knob: #ffffff;
+      --chip-bg: rgba(255, 255, 255, 0.85);
+      --chip-border: rgba(203, 213, 225, 0.7);
+      --track-bg: #ffffff;
+      --track-border: rgba(148, 163, 184, 0.55);
+
+      --text-strong: #1e293b;
+      --text-body: #334155;
+      --text-muted: #566476;
+      --text-weak: #526073;
+      --accent: #0284c7;
+      --accent-strong: #0369a1;
+      --wave: #0284c7;
+
+      --active-face: #e0f2fe;
+      --active-text: #0369a1;
+      --active-border: #bae6fd;
+      --accent-fill: #0369a1;
+      --accent-fill-text: #ffffff;
+    }
+
+    /* ==================== 设计令牌：暗色 ==================== */
+    html.dark {
+      color-scheme: dark;
+      --page-bg: #0a0f15;
+
+      --chrome-bg: rgba(17, 24, 33, 0.92);
+      --chrome-border: rgba(148, 163, 184, 0.18);
+
+      --frame-top: #2b3440;
+      --frame-bottom: #171e27;
+      --frame-border: rgba(148, 163, 184, 0.22);
+      --frame-shadow:
+        0 10px 24px -12px rgba(0, 0, 0, 0.75),
+        0 2px 6px -2px rgba(0, 0, 0, 0.50),
+        inset 0 1px 1px rgba(255, 255, 255, 0.08),
+        inset 0 -1px 1px rgba(0, 0, 0, 0.55);
+
+      --screen-bg: #0d131a;
+      --screen-shadow:
+        inset 0 1px 3px rgba(0, 0, 0, 0.85),
+        inset 0 0 0 1px rgba(148, 163, 184, 0.14);
+
+      --recessed-top: #131b24;
+      --recessed-bottom: #0e161f;
+      --recessed-border: rgba(148, 163, 184, 0.16);
+      --recessed-shadow:
+        inset 0 2px 5px rgba(0, 0, 0, 0.65),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.05);
+
+      --btn-top: #232d3a;
+      --btn-bottom: #18202a;
+      --btn-border: rgba(148, 163, 184, 0.16);
+      --btn-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.45),
+        0 2px 4px -1px rgba(0, 0, 0, 0.60),
+        inset 0 1px 0 rgba(255, 255, 255, 0.10);
+      --btn-shadow-hover:
+        0 1px 0 rgba(0, 0, 0, 0.5),
+        0 3px 6px -2px rgba(0, 0, 0, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.14);
+      --btn-shadow-active:
+        inset 0 2px 5px rgba(0, 0, 0, 0.65),
+        inset 0 -1px 0 rgba(255, 255, 255, 0.06),
+        0 1px 1px rgba(0, 0, 0, 0.40);
+      --btn-face-active: #121a23;
+
+      --primary-top: #0d8ed6;
+      --primary-bottom: #0b5c86;
+      --primary-border: rgba(56, 189, 248, 0.45);
+      --primary-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.45),
+        0 2px 4px -1px rgba(2, 132, 199, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.22);
+      --primary-shadow-hover:
+        0 1px 0 rgba(0, 0, 0, 0.5),
+        0 3px 6px -2px rgba(2, 132, 199, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.26);
+      --primary-shadow-active:
+        inset 0 2px 5px rgba(0, 0, 0, 0.60),
+        0 1px 1px rgba(0, 0, 0, 0.45);
+
+      --danger-top: #e11d48;
+      --danger-bottom: #9f1239;
+      --danger-border: rgba(251, 113, 133, 0.45);
+      --danger-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.45),
+        0 2px 4px -1px rgba(225, 29, 72, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.2);
+      --danger-shadow-active:
+        inset 0 2px 5px rgba(0, 0, 0, 0.60),
+        0 1px 1px rgba(0, 0, 0, 0.45);
+
+      --knob: #f1f5f9;
+      --chip-bg: rgba(30, 41, 59, 0.78);
+      --chip-border: rgba(148, 163, 184, 0.24);
+      --track-bg: rgba(148, 163, 184, 0.16);
+      --track-border: rgba(148, 163, 184, 0.4);
+
+      --text-strong: #f1f5f9;
+      --text-body: #e2e8f0;
+      --text-muted: #a5b4c6;
+      --text-weak: #8494a8;
+      --accent: #38bdf8;
+      --accent-strong: #7dd3fc;
+      --wave: #38bdf8;
+
+      --active-face: rgba(56, 189, 248, 0.16);
+      --active-text: #7dd3fc;
+      --active-border: rgba(56, 189, 248, 0.35);
+      --accent-fill: #075985;
+      --accent-fill-text: #e0f2fe;
+    }
+
+    body {
+      font-family: 'Montserrat', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      background-color: var(--page-bg);
+      user-select: none;
+      -webkit-font-smoothing: antialiased;
+      transition: background-color 0.3s ease;
+    }
+
+    /* 陶瓷外壳：单层小半径投影，避免大面积灰色晕染 */
+    .ceramic-hardware-frame {
+      background: linear-gradient(145deg, var(--frame-top) 0%, var(--frame-bottom) 100%);
+      box-shadow: var(--frame-shadow);
+      border: 1px solid var(--frame-border);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* 450x390 AMOLED 屏幕内陷视口 */
+    .viewport-amoled {
+      width: 450px;
+      height: 390px;
+      background-color: var(--screen-bg);
+      box-shadow: var(--screen-shadow);
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* 时钟排版：秒直接接在分钟右侧，AM/PM 落在数字右上角
+       （原先三者等基线排列，会出现 “11:28 PM :37” 的错误断读） */
+    /* 主时钟让大号数字独占居中：秒与 AM/PM 绝对定位悬挂在右侧，
+       这样无论秒数开关如何切换，数字都不会被推离中心。 */
+    .clock-row {
+      position: relative;
+      display: inline-block;
+      margin-top: 0.25rem;
+    }
+    .clock-seconds {
+      position: absolute;
+      left: 100%;
+      bottom: 0;
+      line-height: 1;
+      margin-left: 1px;
+    }
+    .clock-ampm {
+      position: absolute;
+      top: -0.15rem;
+      left: calc(100% + 0.4rem);
+      line-height: 1;
+      letter-spacing: 0.06em;
+    }
+    .clock-row.with-seconds .clock-ampm {
+      left: calc(100% + 2.65rem);
+    }
+
+    /* 暗色下计时/时钟数字的暖色微光 */
+    html.dark #clock-time-display {
+      color: #fbbf24;
+      text-shadow: 0 0 16px rgba(245, 158, 11, 0.28);
+    }
+
+    /* 陶瓷按钮：小半径硬投影 + 顶部内高光，替代原先的大范围模糊
+       （原 6px/14px 双重外阴影会变成按钮四周一圈灰雾） */
+    .ceramic-btn {
+      background: linear-gradient(165deg, var(--btn-top) 0%, var(--btn-bottom) 100%);
+      box-shadow: var(--btn-shadow);
+      border: 1px solid var(--btn-border);
+      color: var(--text-body);
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  box-shadow 0.15s ease,
+                  background 0.2s ease,
+                  border-color 0.2s ease,
+                  color 0.2s ease;
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    .ceramic-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--btn-shadow-hover);
+      border-color: var(--active-border);
+    }
+
+    .ceramic-btn:active, .ceramic-btn.is-pressed {
+      transform: translateY(1px) scale(0.97);
+      background: var(--btn-face-active);
+      box-shadow: var(--btn-shadow-active);
+    }
+
+    /* 激活态（如秒数开启、12/24切换） */
+    .ceramic-btn.btn-active-state {
+      background: var(--active-face);
+      color: var(--active-text) !important;
+      border-color: var(--active-border);
+      box-shadow: var(--btn-shadow-active);
+    }
+
+    /* 蓝色强调色按键 */
+    .ceramic-btn-primary {
+      background: linear-gradient(165deg, var(--primary-top) 0%, var(--primary-bottom) 100%);
+      box-shadow: var(--primary-shadow);
+      border: 1px solid var(--primary-border);
+      color: #ffffff;
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  box-shadow 0.15s ease,
+                  background 0.2s ease;
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    .ceramic-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: var(--primary-shadow-hover);
+    }
+
+    .ceramic-btn-primary:active, .ceramic-btn-primary.is-pressed {
+      transform: translateY(1px) scale(0.97);
+      background: linear-gradient(165deg, var(--primary-bottom) 0%, #05405c 100%);
+      box-shadow: var(--primary-shadow-active);
+    }
+
+    /* 红色警示色按键（删除二次确认 / 录音） */
+    .ceramic-btn-danger {
+      background: linear-gradient(165deg, var(--danger-top) 0%, var(--danger-bottom) 100%) !important;
+      box-shadow: var(--danger-shadow) !important;
+      border: 1px solid var(--danger-border) !important;
+      color: #ffffff !important;
+      transition: transform 0.15s cubic-bezier(0.2, 0.8, 0.2, 1),
+                  box-shadow 0.15s ease;
+      position: relative;
+      touch-action: manipulation;
+    }
+
+    .ceramic-btn-danger:active {
+      transform: translateY(1px) scale(0.97);
+      box-shadow: var(--danger-shadow-active) !important;
+    }
+
+    /* 内凹视窗卡片 */
+    .ceramic-recessed {
+      background: linear-gradient(180deg, var(--recessed-top) 0%, var(--recessed-bottom) 100%);
+      box-shadow: var(--recessed-shadow);
+      border: 1px solid var(--recessed-border);
+      transition: background 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+    }
+
+    /* 页面切换滑动轨道 (260ms cubic-bezier) */
+    .screens-track {
+      display: flex;
+      width: 1350px; /* 3 screens * 450px */
+      height: 390px;
+      transition: transform 260ms cubic-bezier(0, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    .screen-panel {
+      width: 450px;
+      height: 390px;
+      flex-shrink: 0;
+      position: relative;
+    }
+
+    /* 直立姿态内三模式横向滑动转场 (POMO, TIME, STOPWATCH) */
+    .stand-modes-track {
+      display: flex;
+      width: 1230px; /* 3 submodes * 410px */
+      height: 100%;
+      transition: transform 260ms cubic-bezier(0, 0, 0.2, 1);
+      will-change: transform;
+    }
+
+    /* 音频动态波形动画 */
+    @keyframes wave-jump {
+      0%, 100% {
+        transform: scaleY(0.25);
+      }
+      50% {
+        transform: scaleY(1);
+      }
+    }
+
+    .wave-bar {
+      transform-origin: bottom center;
+      transition: transform 0.2s ease;
+      transform: scaleY(0.22);
+    }
+
+    .waveform-active .wave-bar:nth-child(1) { animation: wave-jump 0.9s ease-in-out infinite 0.1s; }
+    .waveform-active .wave-bar:nth-child(2) { animation: wave-jump 0.75s ease-in-out infinite 0.3s; }
+    .waveform-active .wave-bar:nth-child(3) { animation: wave-jump 1.1s ease-in-out infinite 0.15s; }
+    .waveform-active .wave-bar:nth-child(4) { animation: wave-jump 0.7s ease-in-out infinite 0.4s; }
+    .waveform-active .wave-bar:nth-child(5) { animation: wave-jump 1.0s ease-in-out infinite 0.25s; }
+    .waveform-active .wave-bar:nth-child(6) { animation: wave-jump 0.8s ease-in-out infinite 0.35s; }
+    .waveform-active .wave-bar:nth-child(7) { animation: wave-jump 0.95s ease-in-out infinite 0.18s; }
+
+    /* 波形条使用主题色 */
+    .wave-fill {
+      background-color: var(--wave);
+    }
+
+    /* 录音时波形条变为警示红且快速跳动 */
+    .waveform-recording .wave-bar {
+      background-color: var(--danger-top) !important;
+      animation: wave-jump 0.5s ease-in-out infinite alternate !important;
+    }
+
+    /* 自定义滚动条隐形处理 */
+    .no-scrollbar::-webkit-scrollbar {
+      display: none;
+    }
+    .no-scrollbar {
+      -ms-overflow-style: none;
+      scrollbar-width: none;
+    }
+
+    /* 触控波纹/微反馈动画 */
+    @keyframes pulse-tap {
+      0% { transform: scale(1); }
+      50% { transform: scale(0.92); }
+      100% { transform: scale(1); }
+    }
+    .tap-pop {
+      animation: pulse-tap 0.22s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+
+    /* 媒体按钮被禁用状态 */
+    .media-disabled {
+      opacity: 0.45;
+      pointer-events: none;
+      filter: grayscale(0.6);
+    }
+
+    /* ==================== 主题化工具类 ====================
+       用语义类取代写死的 slate / sky / white，暗色一并覆盖。 */
+    .t-strong { color: var(--text-strong); }
+    .t-body { color: var(--text-body); }
+    .t-muted { color: var(--text-muted); }
+    .t-weak { color: var(--text-weak); }
+    .t-accent { color: var(--accent-strong); }
+    .t-accent-strong { color: var(--accent-strong); }
+    .hover-text-strong:hover { color: var(--text-strong); }
+    .hover-text-body:hover { color: var(--text-body); }
+    .hover-text-muted:hover { color: var(--text-muted); }
+    .hover-text-weak:hover { color: var(--text-weak); }
+    .hover-text-accent-strong:hover { color: var(--accent-strong); }
+    .group-hover-text-accent:hover { color: var(--accent); }
+
+    .surf-chrome { background-color: var(--chrome-bg); border-color: var(--chrome-border); }
+    .surf-solid { border-color: var(--active-border); }
+    .surf-solid { background-color: var(--track-bg); border-color: var(--chip-border); }
+    .surf-card { background-color: var(--chip-bg); border-color: var(--chip-border); }
+    .surf-track { background-color: var(--track-bg); border-color: var(--track-border); }
+    .surf-muted { background-color: var(--chip-bg); border-color: var(--chip-border); }
+
+    .bg-accent { background-color: var(--accent-fill); color: var(--accent-fill-text); }
+    .fill-accent { background-color: var(--accent); }
+    .badge-accent { background-color: var(--active-face); border-color: var(--active-border); }
+    .border-accent-soft { border-color: var(--active-border); }
+
+    .hover-muted:hover { background-color: var(--active-face); }
+    .hover-muted-strong:hover { background-color: var(--chip-bg); }
+
+    .dot-active { background-color: var(--accent); }
+    .dot-idle { background-color: var(--text-weak); }
+    .dot-success { background-color: #10b981; }
+    .dot-warn { background-color: #f59e0b; }
+    .dot-danger { background-color: #f43f5e; }
+
+    /* 晶圆质感实体键与卡槽（随主题切换金属色） */
+    .hw-pebble {
+      background: linear-gradient(180deg, var(--btn-top) 0%, var(--btn-face-active) 100%);
+      border-color: var(--btn-border);
+      color: var(--text-body);
+    }
+    .hw-pebble:hover {
+      background: linear-gradient(180deg, var(--frame-top) 0%, var(--btn-top) 100%);
+    }
+    .hw-slot {
+      background: linear-gradient(270deg, var(--btn-face-active) 0%, var(--btn-top) 100%);
+      border-color: var(--btn-border);
+      color: var(--text-body);
+    }
+    .hw-slot:hover {
+      background: linear-gradient(270deg, var(--btn-top) 0%, var(--frame-top) 100%);
+    }
+
+    /* 小半径硬投影，替代 Tailwind 的大范围模糊阴影 */
+    .pill-shadow {
+      box-shadow: 0 1px 1px rgba(15, 23, 42, 0.10), 0 2px 4px -1px rgba(15, 23, 42, 0.12);
+    }
+    .chip-shadow {
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.08);
+    }
+    html.dark .pill-shadow {
+      box-shadow: 0 1px 1px rgba(0, 0, 0, 0.55), 0 2px 4px -1px rgba(0, 0, 0, 0.5);
+    }
+    html.dark .chip-shadow {
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+    }
+
+    /* 录音/播放进度条内部滑块 */
+    .progress-knob {
+      background-color: var(--knob);
+      box-shadow: 0 1px 2px rgba(15, 23, 42, 0.25);
+    }
+    .rec-ring { border-color: #ffffff; }
+    .rec-core { background-color: #ffffff; }
+</style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center p-4 t-strong">
+<!-- 外部姿态控制切换栏 -->
+<header class="mb-6 flex flex-col items-center gap-3">
+<div class="flex items-center gap-2 surf-chrome backdrop-blur-md px-3.5 py-2.5 rounded-2xl chip-shadow border">
+<span class="text-xs font-bold t-weak uppercase tracking-widest px-2">姿态选择</span>
+<button class="px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 bg-accent pill-shadow flex items-center gap-1.5 cursor-pointer active:scale-95" id="posture-stand" onclick="switchPosture(0)">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><rect height="20" rx="3" width="12" x="6" y="2"></rect><path d="M10 6h4"></path></svg>
+  直立 (专注计时)
+</button>
+<button class="px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 t-muted hover-text-strong hover-muted flex items-center gap-1.5 cursor-pointer active:scale-95" id="posture-side" onclick="switchPosture(1)">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><rect height="12" rx="3" width="20" x="2" y="6"></rect><path d="M6 10v4"></path></svg>
+  侧放 (多媒体遥控)
+</button>
+<button class="px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 t-muted hover-text-strong hover-muted flex items-center gap-1.5 cursor-pointer active:scale-95" id="posture-flat" onclick="switchPosture(2)">
+<svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24"><ellipse cx="12" cy="12" rx="10" ry="6"></ellipse><path d="M9 12h6"></path></svg>
+  放平 (语音便签)
+</button>
+<button class="ml-1 w-9 h-9 rounded-xl t-body hover-muted-strong flex items-center justify-center cursor-pointer transition-all active:scale-95" id="theme-toggle" onclick="toggleNightDisplay()" title="切换全局深色模式">
+<svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24"><path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path></svg>
+</button>
+</div>
+</header>
+<!-- 闪念胶囊实体设备外壳（白色陶瓷质感） -->
+<main class="relative ceramic-hardware-frame rounded-[40px] p-5 flex flex-col items-center">
+<!-- 顶部实体功能按键模拟 KEY2 -->
+<div class="absolute -top-3.5 right-12 z-20">
+<button class="hw-pebble active:scale-90 text-[10px] font-extrabold t-muted px-3.5 py-1 rounded-full pill-shadow border flex items-center gap-1.5 transition-all cursor-pointer" id="hardware-key2" onclick="triggerHardwareKey2()" title="物理功能键 KEY2：侧放一键静音 / 放平录音 / 直立启停">
+<span class="w-1.5 h-1.5 rounded-full dot-idle transition-colors" id="key2-indicator"></span>
+  KEY2
+</button>
+</div>
+<!-- 右侧实体 TF 卡插拔模拟开关 -->
+<div class="absolute -right-3.5 top-28 z-20">
+<button class="hw-slot active:scale-90 text-[9px] font-extrabold t-muted px-2 py-2 rounded-l-lg rounded-r-none pill-shadow border-y border-l flex flex-col items-center gap-1.5 transition-all cursor-pointer" id="hardware-tf-slot" onclick="toggleTfCardSlot()" title="物理卡槽模拟：点击插拔 TF 卡">
+<div class="w-1.5 h-1.5 rounded-full dot-active chip-shadow transition-colors" id="tf-slot-indicator"></div>
+<span class="text-[8px] font-bold tracking-tighter" style="writing-mode: vertical-lr;">CARD</span>
+</button>
+</div>
+<!-- 450 × 390 硬件内视口容器 (无多余角标/纯净 AMOLED) -->
+<div class="viewport-amoled rounded-[28px] overflow-hidden relative" id="amoled-viewport">
+<!-- 三姿态横向滑动总轨道 -->
+<div class="screens-track" id="screensTrack" style="transform: translateX(0px);">
+<!-- ==================== 1. 直立姿态：专注主页 (POMO / TIME / STOPWATCH) ==================== -->
+<section class="screen-panel p-5 flex flex-col justify-between" id="stand-view-container">
+<!-- 顶部控制条：居中三项药丸 (POMO / TIME / STOPWATCH) -->
+<div class="flex items-center justify-center px-1 z-10">
+<div class="ceramic-recessed p-1 rounded-2xl flex items-center relative gap-0.5" id="stand-tab-container">
+<button class="px-4 py-1.5 rounded-xl text-[11px] font-bold tracking-wider t-muted hover-text-body transition-all duration-200 cursor-pointer active:scale-95" id="tab-pomo" onclick="setStandMode(0)">POMO</button>
+<button class="px-4 py-1.5 rounded-xl text-[11px] font-extrabold tracking-wider transition-all duration-200 surf-solid t-accent-strong chip-shadow cursor-pointer active:scale-95" id="tab-time" onclick="setStandMode(1)">TIME</button>
+<button class="px-4 py-1.5 rounded-xl text-[11px] font-bold tracking-wider t-muted hover-text-body transition-all duration-200 cursor-pointer active:scale-95" id="tab-stopwatch" onclick="setStandMode(2)">STOPWATCH</button>
+</div>
+</div>
+<!-- 模式切换手势与视图视窗；底部留 8px 供按钮投影，避免被 overflow 裁成硬边 -->
+<div class="w-full flex-1 overflow-hidden my-1 relative cursor-grab active:cursor-grabbing" id="stand-gesture-area">
+<div class="stand-modes-track flex h-full" id="standModesTrack" style="transform: translateX(-410px);">
+<!-- === 子模式 A: POMO 番茄钟 === -->
+<div class="mode-pane w-[410px] flex-shrink-0 flex flex-col justify-between h-full pt-1 pb-2">
+<!-- 中心内凹显示屏 -->
+<div class="ceramic-recessed rounded-3xl p-4 flex flex-col items-center justify-center h-[208px]">
+<div class="relative w-full flex items-center justify-center">
+<div class="text-[64px] font-extrabold t-strong tracking-tight leading-none tabular-nums" id="timer-display">25:00</div>
+<button class="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-2xl ceramic-btn flex items-center justify-center t-accent transition-all duration-200 hover-text-accent-strong cursor-pointer chip-shadow active:scale-90 btn-active-state" id="beep-toggle-btn" onclick="toggleBeep()" title="番茄钟完成提示音开关">
+<svg class="w-5 h-5 transition-transform duration-200" fill="none" id="beep-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" viewbox="0 0 24 24">
+<path d="M6 8a6 6 0 0 1 12 0c0 7 3 9 3 9H3s3-2 3-9"></path>
+<path d="M10.3 21a1.94 1.94 0 0 0 3.4 0"></path>
+</svg>
+</button>
+</div>
+<!-- 状态微提示浮层 -->
+<div class="text-[10px] font-bold tracking-widest t-weak mt-2 uppercase flex items-center gap-1.5">
+<span class="w-1.5 h-1.5 rounded-full dot-idle" id="pomo-dot"></span>
+<span id="pomo-status-label">READY</span>
+</div>
+</div>
+<!-- 底部四键：[-] [复位↺] [▶/⏸ 启停] [+] 确保复位与调整都一应俱全 -->
+<div class="grid grid-cols-4 gap-2.5">
+<button class="h-14 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" id="btn-pomo-dec" onclick="adjustTime(-5)" title="减少5分钟 (长按连续微调)">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" viewbox="0 0 24 24">
+<line x1="5" x2="19" y1="12" y2="12"></line>
+</svg>
+</button>
+<button class="h-14 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" onclick="resetPomoTimer()" title="复位为设定时长">
+<svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+<path d="M3 3v5h5"></path>
+</svg>
+</button>
+<button class="h-14 rounded-2xl ceramic-btn-primary flex items-center justify-center transition-all cursor-pointer active:scale-90" id="pomo-main-btn" onclick="toggleTimerRunning()" title="开始/暂停">
+<svg class="w-6 h-6 ml-0.5" fill="currentColor" id="pomo-main-icon" viewbox="0 0 24 24">
+<polygon points="5 3 19 12 5 21 5 3"></polygon>
+</svg>
+</button>
+<button class="h-14 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" id="btn-pomo-inc" onclick="adjustTime(5)" title="增加5分钟 (长按连续微调)">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.8" viewbox="0 0 24 24">
+<line x1="12" x2="12" y1="5" y2="19"></line>
+<line x1="5" x2="19" y1="12" y2="12"></line>
+</svg>
+</button>
+</div>
+</div>
+<!-- === 子模式 B: TIME 桌面时钟 === -->
+<div class="mode-pane w-[410px] flex-shrink-0 flex flex-col justify-between h-full pt-1 pb-2">
+<div class="ceramic-recessed rounded-3xl p-4 flex flex-col items-center justify-center h-[208px]">
+<div class="clock-row leading-none">
+<span class="text-[58px] font-extrabold t-strong tracking-tight leading-none tabular-nums" id="clock-time-display">10:42</span>
+<span class="clock-seconds text-2xl font-bold t-accent tabular-nums hidden" id="clock-seconds-display">:00</span>
+<span class="clock-ampm text-xs font-extrabold t-accent uppercase" id="clock-ampm-display">AM</span>
+</div>
+<div class="mt-2 text-xs font-bold t-weak tracking-widest uppercase flex items-center gap-1.5" id="clock-date-display">
+<span>MON</span><span>·</span><span>OCT 24</span>
+</div>
+</div>
+<!-- 底部三键：[12/24H制切换] [秒数跳动开关] [微晶夜间模式] -->
+<div class="grid grid-cols-3 gap-3">
+<button class="h-14 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" id="btn-clock-format" onclick="toggleClockFormat()" title="12/24小时制切换">
+<span class="text-xs font-extrabold tracking-wider" id="clock-format-label">24H</span>
+</button>
+<button class="h-14 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" id="btn-clock-seconds" onclick="toggleClockSeconds()" title="秒数显示开关">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<circle cx="12" cy="12" r="9"></circle>
+<polyline points="12 7 12 12 15 15"></polyline>
+</svg>
+</button>
+<button class="h-14 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" id="clock-night-btn" onclick="toggleNightDisplay()" title="暗夜微晶护眼模式切换">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.2" viewbox="0 0 24 24">
+<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"></path>
+</svg>
+</button>
+</div>
+</div>
+<!-- === 子模式 C: STOPWATCH 正向计时/秒表 === -->
+<div class="mode-pane w-[410px] flex-shrink-0 flex flex-col justify-between h-full pt-1 pb-2">
+<!-- 中心内凹显示屏：秒表跑秒 + 滚动的计次胶囊 -->
+<div class="ceramic-recessed rounded-3xl p-3 flex flex-col items-center justify-between h-[208px]">
+<div class="my-auto text-center">
+<div class="text-[52px] font-extrabold t-strong tracking-tight leading-none tabular-nums" id="stopwatch-display">00:00.0</div>
+</div>
+<!-- 最近计次微缩滚动条 -->
+<div class="w-full flex items-center justify-center gap-2 overflow-x-auto no-scrollbar py-1" id="stopwatch-laps-container">
+<span data-placeholder class="text-[10px] font-bold t-muted surf-card px-2.5 py-1 rounded-full border">NO LAP</span>
+</div>
+</div>
+<!-- 底部三键：[↺ 复位] [▶/⏸ 启动暂停] [⚑ 计次] -->
+<div class="grid grid-cols-3 gap-3">
+<button class="h-14 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" onclick="resetStopwatch()" title="复位清零">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path>
+<path d="M3 3v5h5"></path>
+</svg>
+</button>
+<button class="h-14 rounded-2xl ceramic-btn-primary flex items-center justify-center transition-all cursor-pointer active:scale-90" id="stopwatch-main-btn" onclick="toggleStopwatch()">
+<svg class="w-6 h-6 ml-0.5" fill="currentColor" id="stopwatch-main-icon" viewbox="0 0 24 24"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+</button>
+<button class="h-14 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" onclick="recordStopwatchLap()" title="计次分段">
+<svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" viewbox="0 0 24 24">
+<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"></path>
+<line x1="4" x2="4" y1="22" y2="15"></line>
+</svg>
+</button>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- ==================== 2. 侧放姿态：多媒体遥控页 (450 x 390) ==================== -->
+<section class="screen-panel p-5 flex flex-col justify-between" id="side-view-container">
+<!-- 顶部状态栏：仅保留桌面编号与可点击切换的蓝牙 CONNECTED 状态 -->
+<div class="flex items-center justify-between px-1">
+<div class="text-xs font-semibold t-weak">DESK·02</div>
+<button class="px-3 py-1 rounded-full badge-accent border font-extrabold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 hover-muted" id="bt-status-badge" onclick="toggleBluetoothState()" title="点击切换蓝牙连接状态模拟">
+<svg class="w-3 h-3 t-accent" fill="none" id="bt-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewbox="0 0 24 24">
+<path d="m7 7 10 10-5 5V2l5 5L7 17"></path>
+</svg>
+<span id="bt-status-text">CONNECTED</span>
+</button>
+</div>
+<!-- 6 个触控大按钮 (3行2列，统一圆润陶瓷，按压反馈增强) -->
+<div class="grid grid-cols-2 gap-3 px-1 my-auto" id="media-buttons-grid">
+<!-- VOL - -->
+<button class="h-20 rounded-2xl ceramic-btn flex items-center justify-center cursor-pointer active:scale-90 transition-all group" onclick="handleMediaAction('VOL -')">
+<svg class="w-7 h-7 t-body group-hover-text-accent transition-colors" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+<line x1="15" x2="19" y1="12" y2="12"></line>
+</svg>
+</button>
+<!-- VOL + -->
+<button class="h-20 rounded-2xl ceramic-btn flex items-center justify-center cursor-pointer active:scale-90 transition-all group" onclick="handleMediaAction('VOL +')">
+<svg class="w-7 h-7 t-body group-hover-text-accent transition-colors" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+<path d="M15 9.34a4 4 0 0 1 0 5.32"></path>
+<path d="M18.5 6a7.5 7.5 0 0 1 0 12"></path>
+</svg>
+</button>
+<!-- PREV -->
+<button class="h-20 rounded-2xl ceramic-btn flex items-center justify-center cursor-pointer active:scale-90 transition-all group" onclick="handleMediaAction('PREV')">
+<svg class="w-7 h-7 t-body group-hover-text-accent transition-colors" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<polygon points="19 20 9 12 19 4 19 20"></polygon>
+<line x1="5" x2="5" y1="19" y2="5"></line>
+</svg>
+</button>
+<!-- NEXT -->
+<button class="h-20 rounded-2xl ceramic-btn flex items-center justify-center cursor-pointer active:scale-90 transition-all group" onclick="handleMediaAction('NEXT')">
+<svg class="w-7 h-7 t-body group-hover-text-accent transition-colors" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<polygon points="5 4 15 12 5 20 5 4"></polygon>
+<line x1="19" x2="19" y1="5" y2="19"></line>
+</svg>
+</button>
+<!-- MUTE TOGGLE -->
+<button class="h-20 rounded-2xl ceramic-btn flex items-center justify-center cursor-pointer active:scale-90 transition-all" id="media-mute-btn" onclick="toggleMediaMute()" title="一键静音/解除">
+<svg class="w-7 h-7 t-body" fill="none" id="media-mute-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+<line x1="23" x2="17" y1="9" y2="15"></line>
+<line x1="17" x2="23" y1="9" y2="15"></line>
+</svg>
+</button>
+<!-- PLAY / PAUSE -->
+<button class="h-20 rounded-2xl ceramic-btn-primary flex items-center justify-center cursor-pointer active:scale-90 transition-all" id="media-play-btn" onclick="toggleMediaPlay()">
+<svg class="w-7 h-7 ml-0.5" fill="currentColor" id="media-play-icon" viewbox="0 0 24 24">
+<polygon points="5 3 19 12 5 21 5 3"></polygon>
+</svg>
+</button>
+</div>
+<!-- 音量/切歌操作即时微反馈条 -->
+<div class="h-4 flex items-center justify-center text-[10px] font-bold t-accent tracking-wider uppercase" id="media-feedback-tip">MEDIA CONTROLLER</div>
+</section>
+<!-- ==================== 3. 放平姿态：语音便签与回放页 (450 x 390) ==================== -->
+<section class="screen-panel p-5 flex flex-col justify-between" id="flat-view-container">
+<!-- 录音卡片展示区域 -->
+<div class="ceramic-recessed rounded-3xl p-5 mx-1 flex flex-col justify-between h-[215px]">
+<div class="flex items-center justify-between">
+<!-- 纯粹文件名展示 -->
+<div class="flex items-center">
+<span class="text-base font-extrabold t-strong tracking-wide" id="memo-filename">MEMO_01.WAV</span>
+</div>
+<!-- 动态音频波形指示器：未播放保持低矮，播放或录音时起伏跳动 -->
+<div class="flex items-end gap-1 h-6 px-3 py-1 rounded-full surf-solid border" id="memo-waveform-container">
+<span class="wave-bar w-1 h-4 wave-fill rounded-full"></span>
+<span class="wave-bar w-1 h-5 wave-fill rounded-full"></span>
+<span class="wave-bar w-1 h-3.5 wave-fill rounded-full"></span>
+<span class="wave-bar w-1 h-5.5 wave-fill rounded-full"></span>
+<span class="wave-bar w-1 h-4 wave-fill rounded-full"></span>
+<span class="wave-bar w-1 h-5 wave-fill rounded-full"></span>
+<span class="wave-bar w-1 h-3.5 wave-fill rounded-full"></span>
+</div>
+</div>
+<!-- 录音时长与状态大字 -->
+<div class="flex items-baseline justify-between my-2">
+<span class="text-4xl font-extrabold t-strong tracking-tight tabular-nums" id="memo-time-display">00:18</span>
+<span class="text-xs font-extrabold t-weak tabular-nums" id="memo-limit-display">00:30</span>
+</div>
+<!-- 平滑回放进度胶囊 (可点击寻道) -->
+<div class="w-full surf-track border h-6 rounded-full p-1 flex items-center relative overflow-hidden cursor-pointer" id="memo-progress-track" onclick="handleProgressBarClick(event)">
+<div class="fill-accent h-full rounded-full transition-all duration-150 flex items-center justify-end pr-1 chip-shadow" id="memo-progress-bar" style="width: 60%;">
+<div class="w-2.5 h-2.5 rounded-full progress-knob"></div>
+</div>
+</div>
+</div>
+<!-- 底部 4 键操作栏：TF卡切歌、播放、录音、删除 -->
+<div class="grid grid-cols-4 gap-2.5 px-1 items-center">
+<!-- 文件夹图标按钮：TF卡插入高亮，未插入白瓷灰色 -->
+<button class="h-16 rounded-2xl ceramic-btn-primary flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-90" id="memo-storage-btn" onclick="handleStorageAction()" title="TF卡在线（点击循环浏览便签）">
+<div class="w-6 h-6 flex items-center justify-center" id="memo-storage-icon-container">
+<svg class="w-6 h-6" fill="none" id="folder-icon" stroke="#ffffff" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" viewbox="0 0 24 24">
+<path d="M4 20h16a2 2 0 0 0 2-2V8a2 2 0 0 0-2-2h-7.93a2 2 0 0 1-1.66-.9l-.82-1.2A2 2 0 0 0 7.93 3H4a2 2 0 0 0-2 2v13c0 1.1.9 2 2 2Z"></path>
+</svg>
+</div>
+</button>
+<!-- 播放/暂停 -->
+<button class="h-16 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all cursor-pointer active:scale-90" id="memo-play-btn" onclick="toggleMemoPlay()" title="播放/暂停便签录音">
+<svg class="w-6 h-6 ml-0.5" fill="none" id="memo-play-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.4" viewbox="0 0 24 24">
+<polygon points="5 3 19 12 5 21 5 3"></polygon>
+</svg>
+</button>
+<!-- 录音按键 (点击呼吸闪烁红色) -->
+<button class="h-16 rounded-2xl ceramic-btn-primary flex items-center justify-center cursor-pointer active:scale-90 transition-all" id="memo-rec-btn" onclick="toggleMemoRecord()" title="点击开始/停止录制">
+  <div class="w-5 h-5 rounded-full border-2 rec-ring flex items-center justify-center" id="memo-rec-indicator">
+<div class="w-2.5 h-2.5 rounded-full rec-core transition-all"></div>
+</div>
+</button>
+<!-- 删除按键 (首次变红 CONFIRM?，再次点击安全删除) -->
+<button class="h-16 rounded-2xl ceramic-btn flex items-center justify-center t-body transition-all cursor-pointer active:scale-90" id="memo-del-btn" onclick="handleMemoDelete()" title="删除当前便签">
+<span class="flex items-center justify-center" id="del-btn-content">
+<svg class="w-6 h-6" fill="none" id="memo-del-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" viewbox="0 0 24 24">
+<path d="M3 6h18"></path>
+<path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+<path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+</svg>
+</span>
+</button>
+</div>
+</section>
+</div>
+</div>
+<!-- 底部状态指示与微拟物外设信息 -->
+<footer class="mt-4 flex items-center justify-between w-[450px] px-2 text-xs font-semibold t-weak">
+<span>1.85" AMOLED 450×390</span>
+<span id="current-posture-text">当前姿态：直立 (STAND)</span>
+<span class="flex items-center gap-1.5 cursor-pointer hover-text-body transition-colors" onclick="toggleTfCardSlot()" title="点击模拟插拔 TF 卡">
+<span class="w-2 h-2 rounded-full dot-success" id="storage-hardware-dot"></span>
+<span id="storage-hardware-text">TF卡在线</span>
+</span>
+</footer>
+</main>
+<!-- 全局触控音效与交互逻辑 JavaScript -->
+<script>
+    /* ==================== 1. 核心姿态切换逻辑 (260ms 滑动转场与高亮) ==================== */
+    let currentPostureIndex = 0; // 0: 直立 (STAND), 1: 侧放 (SIDE), 2: 放平 (FLAT)
+    const postureNames = ['直立 (STAND)', '侧放 (SIDE)', '放平 (FLAT)'];
+    const screensTrack = document.getElementById('screensTrack');
+    const postureText = document.getElementById('current-posture-text');
+
+    const postureButtons = [
+      document.getElementById('posture-stand'),
+      document.getElementById('posture-side'),
+      document.getElementById('posture-flat')
+    ];
+
+    function switchPosture(index) {
+      currentPostureIndex = index;
+      const offsetPx = index * 450;
+      screensTrack.style.transform = `translateX(-${offsetPx}px)`;
+      postureText.textContent = `当前姿态：${postureNames[index]}`;
+
+      postureButtons.forEach((btn, i) => {
+        if (i === index) {
+          btn.className = "px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 bg-accent pill-shadow flex items-center gap-1.5 cursor-pointer active:scale-95";
+        } else {
+          btn.className = "px-4 py-2 rounded-xl text-xs font-bold tracking-wide transition-all duration-200 t-muted hover-text-strong hover-muted flex items-center gap-1.5 cursor-pointer active:scale-95";
+        }
+      });
+
+      resetDeleteConfirm();
+    }
+
+    /* ==================== 2. 直立姿态：三模式切换与手势滑动 (POMO / TIME / STOPWATCH) ==================== */
+    let currentStandMode = 1; // 0: POMO, 1: TIME, 2: STOPWATCH
+    const standModesTrack = document.getElementById('standModesTrack');
+    const tabPomo = document.getElementById('tab-pomo');
+    const tabTime = document.getElementById('tab-time');
+    const tabStopwatch = document.getElementById('tab-stopwatch');
+    const standTabs = [tabPomo, tabTime, tabStopwatch];
+
+    function setStandMode(modeIndex) {
+      currentStandMode = Math.max(0, Math.min(2, modeIndex));
+      standModesTrack.style.transform = `translateX(-${currentStandMode * 410}px)`;
+
+      standTabs.forEach((tab, i) => {
+        if (i === currentStandMode) {
+          tab.className = "px-4 py-1.5 rounded-xl text-[11px] font-extrabold tracking-wider transition-all duration-200 surf-solid t-accent-strong chip-shadow cursor-pointer active:scale-95";
+        } else {
+          tab.className = "px-4 py-1.5 rounded-xl text-[11px] font-bold tracking-wider t-muted hover-text-body transition-all duration-200 cursor-pointer active:scale-95";
+        }
+      });
+    }
+
+    // 支持鼠标拖拽 / 触摸滑动 (Touch & Drag Gesture)
+    const gestureArea = document.getElementById('stand-gesture-area');
+    let startX = 0;
+    let isDragging = false;
+
+    gestureArea.addEventListener('mousedown', (e) => {
+      // 避免点击按键时误触发拖拽切换
+      if (e.target.closest('button')) return;
+      startX = e.clientX;
+      isDragging = true;
+    });
+
+    gestureArea.addEventListener('mouseup', (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      const diffX = e.clientX - startX;
+      handleSwipeGesture(diffX);
+    });
+
+    gestureArea.addEventListener('touchstart', (e) => {
+      if (e.target.closest('button')) return;
+      startX = e.touches[0].clientX;
+    }, { passive: true });
+
+    gestureArea.addEventListener('touchend', (e) => {
+      const diffX = e.changedTouches[0].clientX - startX;
+      handleSwipeGesture(diffX);
+    });
+
+    function handleSwipeGesture(diffX) {
+      if (Math.abs(diffX) > 40) {
+        if (diffX < 0 && currentStandMode < 2) {
+          setStandMode(currentStandMode + 1); // 向左滑，下一页
+        } else if (diffX > 0 && currentStandMode > 0) {
+          setStandMode(currentStandMode - 1); // 向右滑，上一页
+        }
+      }
+    }
+
+    /* --- 子模式 A：POMO 番茄钟逻辑（步进、长按、启停、复位、铃铛） --- */
+    let pomoSetMinutes = 25;
+    let timerSecondsLeft = 25 * 60;
+    let isTimerRunning = false;
+    let timerInterval = null;
+    let isBeepOn = true;
+
+    const timerDisplay = document.getElementById('timer-display');
+    const pomoMainBtn = document.getElementById('pomo-main-btn');
+    const pomoMainIcon = document.getElementById('pomo-main-icon');
+    const pomoDot = document.getElementById('pomo-dot');
+    const pomoStatusLabel = document.getElementById('pomo-status-label');
+
+    function updatePomoDisplay() {
+      const mins = Math.floor(timerSecondsLeft / 60);
+      const secs = timerSecondsLeft % 60;
+      const formattedMins = mins < 10 ? '0' + mins : mins;
+      const formattedSecs = secs < 10 ? '0' + secs : secs;
+      timerDisplay.textContent = `${formattedMins}:${formattedSecs}`;
+    }
+
+    function adjustTime(deltaMins) {
+      if (isTimerRunning) return;
+      pomoSetMinutes = Math.min(120, Math.max(1, pomoSetMinutes + deltaMins));
+      timerSecondsLeft = pomoSetMinutes * 60;
+      updatePomoDisplay();
+      timerDisplay.classList.add('scale-105');
+      setTimeout(() => timerDisplay.classList.remove('scale-105'), 120);
+    }
+
+    // 支持长按连续步进
+    function setupHoldButton(btnId, delta) {
+      const btn = document.getElementById(btnId);
+      let holdTimer = null;
+      let intervalTimer = null;
+
+      const startHold = (e) => {
+        if (isTimerRunning) return;
+        holdTimer = setTimeout(() => {
+          intervalTimer = setInterval(() => {
+            adjustTime(delta);
+          }, 120);
+        }, 400);
+      };
+
+      const clearHold = () => {
+        clearTimeout(holdTimer);
+        clearInterval(intervalTimer);
+      };
+
+      btn.addEventListener('mousedown', startHold);
+      btn.addEventListener('mouseup', clearHold);
+      btn.addEventListener('mouseleave', clearHold);
+      btn.addEventListener('touchstart', startHold, { passive: true });
+      btn.addEventListener('touchend', clearHold);
+    }
+
+    setupHoldButton('btn-pomo-dec', -5);
+    setupHoldButton('btn-pomo-inc', 5);
+
+    function toggleTimerRunning() {
+      isTimerRunning = !isTimerRunning;
+      if (isTimerRunning) {
+        pomoMainIcon.innerHTML = `<rect x="6" y="4" width="4" height="16" rx="1.5"></rect><rect x="14" y="4" width="4" height="16" rx="1.5"></rect>`;
+        pomoStatusLabel.textContent = "RUNNING";
+        pomoDot.className = "w-1.5 h-1.5 rounded-full dot-warn animate-ping";
+        
+        clearInterval(timerInterval);
+        timerInterval = setInterval(() => {
+          if (timerSecondsLeft > 0) {
+            timerSecondsLeft--;
+            updatePomoDisplay();
+          } else {
+            clearInterval(timerInterval);
+            isTimerRunning = false;
+            pomoMainIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+            pomoStatusLabel.textContent = "COMPLETED";
+            pomoDot.className = "w-1.5 h-1.5 rounded-full dot-success";
+            if (isBeepOn) {
+              timerDisplay.classList.add('animate-bounce');
+              setTimeout(() => timerDisplay.classList.remove('animate-bounce'), 1000);
+            }
+          }
+        }, 1000);
+      } else {
+        clearInterval(timerInterval);
+        pomoMainIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+        pomoStatusLabel.textContent = "PAUSED";
+        pomoDot.className = "w-1.5 h-1.5 rounded-full dot-idle";
+      }
+    }
+
+    function resetPomoTimer() {
+      clearInterval(timerInterval);
+      isTimerRunning = false;
+      timerSecondsLeft = pomoSetMinutes * 60;
+      updatePomoDisplay();
+      pomoMainIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+      pomoStatusLabel.textContent = "RESET";
+      pomoDot.className = "w-1.5 h-1.5 rounded-full dot-idle";
+    }
+
+    function toggleBeep() {
+      isBeepOn = !isBeepOn;
+      const beepBtn = document.getElementById('beep-toggle-btn');
+      const beepIcon = document.getElementById('beep-icon');
+      if (isBeepOn) {
+        beepBtn.className = "absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-2xl ceramic-btn flex items-center justify-center t-accent transition-all duration-200 hover-text-accent-strong cursor-pointer chip-shadow active:scale-90 btn-active-state";
+        beepIcon.style.opacity = "1";
+      } else {
+        beepBtn.className = "absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 rounded-2xl ceramic-btn flex items-center justify-center t-weak transition-all duration-200 hover-text-muted cursor-pointer chip-shadow active:scale-90";
+        beepIcon.style.opacity = "0.35";
+      }
+    }
+
+    /* --- 子模式 B：TIME 桌面时钟逻辑 (12/24H制、秒数、微晶暗夜) --- */
+    let is24Hour = false;
+    let showSeconds = false;
+    let isNightMode = false;
+    const amoledViewport = document.getElementById('amoled-viewport');
+    const clockTimeDisplay = document.getElementById('clock-time-display');
+    const clockAmpmDisplay = document.getElementById('clock-ampm-display');
+    const clockSecondsDisplay = document.getElementById('clock-seconds-display');
+    const clockDateDisplay = document.getElementById('clock-date-display');
+    const clockRow = document.querySelector('.clock-row');
+    const clockNightBtn = document.getElementById('clock-night-btn');
+    const btnClockFormat = document.getElementById('btn-clock-format');
+    const clockFormatLabel = document.getElementById('clock-format-label');
+    const btnClockSeconds = document.getElementById('btn-clock-seconds');
+
+    function updateLiveClock() {
+      const now = new Date();
+      let hours = now.getHours();
+      const minutes = now.getMinutes();
+      const seconds = now.getSeconds();
+
+      const formattedMin = minutes < 10 ? '0' + minutes : minutes;
+      const formattedSec = seconds < 10 ? '0' + seconds : seconds;
+      
+      if (!is24Hour) {
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        hours = hours % 12;
+        hours = hours ? hours : 12;
+        const formattedHour = hours < 10 ? '0' + hours : hours;
+        clockTimeDisplay.textContent = `${formattedHour}:${formattedMin}`;
+        clockAmpmDisplay.textContent = ampm;
+        clockAmpmDisplay.style.display = 'inline';
+      } else {
+        const formattedHour = hours < 10 ? '0' + hours : hours;
+        clockTimeDisplay.textContent = `${formattedHour}:${formattedMin}`;
+        clockAmpmDisplay.style.display = 'none';
+      }
+
+      if (showSeconds) {
+        clockSecondsDisplay.textContent = `:${formattedSec}`;
+        clockSecondsDisplay.classList.remove('hidden');
+        clockRow.classList.add('with-seconds');
+      } else {
+        clockSecondsDisplay.classList.add('hidden');
+        clockRow.classList.remove('with-seconds');
+      }
+
+      const days = ['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'];
+      const months = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+      clockDateDisplay.innerHTML = `<span>${days[now.getDay()]}</span><span>·</span><span>${months[now.getMonth()]} ${now.getDate()}</span>`;
+    }
+
+    function toggleClockFormat() {
+      is24Hour = !is24Hour;
+      clockFormatLabel.textContent = is24Hour ? '12H' : '24H';
+      if (is24Hour) {
+        btnClockFormat.classList.add('btn-active-state');
+      } else {
+        btnClockFormat.classList.remove('btn-active-state');
+      }
+      updateLiveClock();
+    }
+
+    function toggleClockSeconds() {
+      showSeconds = !showSeconds;
+      if (showSeconds) {
+        btnClockSeconds.classList.add('btn-active-state');
+      } else {
+        btnClockSeconds.classList.remove('btn-active-state');
+      }
+      updateLiveClock();
+    }
+
+    // 全局暗色主题：作用于页面外壳、四块屏幕和所有控件，不只是时钟页
+    function applyTheme(dark) {
+      isNightMode = dark;
+      document.documentElement.classList.toggle('dark', dark);
+      clockNightBtn.classList.toggle('btn-active-state', dark);
+    }
+
+    function toggleNightDisplay() {
+      applyTheme(!isNightMode);
+    }
+
+    setInterval(updateLiveClock, 1000);
+    updateLiveClock();
+
+    /* --- 子模式 C：STOPWATCH 秒表逻辑 (精准跑秒、复位、分段打点) --- */
+    let stopwatchMs = 0;
+    let isStopwatchRunning = false;
+    let stopwatchInterval = null;
+    let lapCount = 0;
+
+    const stopwatchDisplay = document.getElementById('stopwatch-display');
+    const stopwatchMainIcon = document.getElementById('stopwatch-main-icon');
+    const stopwatchLapsContainer = document.getElementById('stopwatch-laps-container');
+
+    function formatStopwatch(ms) {
+      const totalSec = Math.floor(ms / 10);
+      const tenths = ms % 10;
+      const mins = Math.floor(totalSec / 60);
+      const secs = totalSec % 60;
+      const fMins = mins < 10 ? '0' + mins : mins;
+      const fSecs = secs < 10 ? '0' + secs : secs;
+      return `${fMins}:${fSecs}.${tenths}`;
+    }
+
+    function toggleStopwatch() {
+      isStopwatchRunning = !isStopwatchRunning;
+      if (isStopwatchRunning) {
+        stopwatchMainIcon.innerHTML = `<rect x="6" y="4" width="4" height="16" rx="1.5"></rect><rect x="14" y="4" width="4" height="16" rx="1.5"></rect>`;
+        clearInterval(stopwatchInterval);
+        stopwatchInterval = setInterval(() => {
+          stopwatchMs++;
+          stopwatchDisplay.textContent = formatStopwatch(stopwatchMs);
+        }, 100);
+      } else {
+        clearInterval(stopwatchInterval);
+        stopwatchMainIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+      }
+    }
+
+    function resetStopwatch() {
+      clearInterval(stopwatchInterval);
+      isStopwatchRunning = false;
+      stopwatchMs = 0;
+      lapCount = 0;
+      stopwatchDisplay.textContent = "00:00.0";
+      stopwatchMainIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+      stopwatchLapsContainer.innerHTML = `<span data-placeholder class="text-[10px] font-bold t-muted surf-card px-2.5 py-1 rounded-full border">NO LAP</span>`;
+    }
+
+    function recordStopwatchLap() {
+      if (!isStopwatchRunning && stopwatchMs === 0) return;
+      lapCount++;
+      const lapTime = formatStopwatch(stopwatchMs);
+      const placeholder = stopwatchLapsContainer.querySelector('[data-placeholder]');
+      if (placeholder) placeholder.remove();
+      const pill = document.createElement('span');
+      pill.className = "text-[10px] font-bold t-strong surf-solid px-2.5 py-1 rounded-full border border-accent-soft chip-shadow whitespace-nowrap animate-bounce";
+      pill.textContent = `LAP ${lapCount} · ${lapTime}`;
+      setTimeout(() => pill.classList.remove('animate-bounce'), 400);
+      stopwatchLapsContainer.prepend(pill);
+    }
+
+    /* ==================== 3. 侧放姿态：多媒体遥控逻辑 ==================== */
+    let isMediaPlaying = false;
+    let isMediaMuted = false;
+    let isBluetoothConnected = true;
+    let mediaTipTimer = null;
+
+    const mediaFeedbackTip = document.getElementById('media-feedback-tip');
+    const btStatusBadge = document.getElementById('bt-status-badge');
+    const btStatusText = document.getElementById('bt-status-text');
+    const btIcon = document.getElementById('bt-icon');
+    const mediaButtonsGrid = document.getElementById('media-buttons-grid');
+
+    function showMediaFeedback(text) {
+      mediaFeedbackTip.textContent = text;
+      mediaFeedbackTip.classList.add('t-accent', 'font-black');
+      clearTimeout(mediaTipTimer);
+      mediaTipTimer = setTimeout(() => {
+        mediaFeedbackTip.textContent = isBluetoothConnected ? "MEDIA CONTROLLER" : "BLUETOOTH DISCONNECTED";
+      }, 1500);
+    }
+
+    function toggleBluetoothState() {
+      isBluetoothConnected = !isBluetoothConnected;
+      if (isBluetoothConnected) {
+        btStatusBadge.className = "px-3 py-1 rounded-full badge-accent border font-extrabold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 hover-muted";
+        btStatusText.textContent = "CONNECTED";
+        btIcon.style.opacity = "1";
+        mediaButtonsGrid.classList.remove('media-disabled');
+        showMediaFeedback("BLUETOOTH CONNECTED");
+      } else {
+        btStatusBadge.className = "px-3 py-1 rounded-full surf-muted border t-weak font-extrabold text-[11px] flex items-center gap-1.5 transition-all cursor-pointer active:scale-95 hover-muted-strong";
+        btStatusText.textContent = "OFFLINE";
+        btIcon.style.opacity = "0.4";
+        mediaButtonsGrid.classList.add('media-disabled');
+        showMediaFeedback("DEVICE OFFLINE");
+      }
+    }
+
+    function toggleMediaPlay() {
+      if (!isBluetoothConnected) return;
+      isMediaPlaying = !isMediaPlaying;
+      const playIcon = document.getElementById('media-play-icon');
+      if (isMediaPlaying) {
+        playIcon.innerHTML = `<rect x="6" y="4" width="4" height="16" rx="1.5"></rect><rect x="14" y="4" width="4" height="16" rx="1.5"></rect>`;
+        showMediaFeedback("PLAYING");
+      } else {
+        playIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+        showMediaFeedback("PAUSED");
+      }
+    }
+
+    function toggleMediaMute() {
+      if (!isBluetoothConnected) return;
+      isMediaMuted = !isMediaMuted;
+      const muteBtn = document.getElementById('media-mute-btn');
+      if (isMediaMuted) {
+        muteBtn.classList.add('btn-active-state');
+        showMediaFeedback("MUTED");
+      } else {
+        muteBtn.classList.remove('btn-active-state');
+        showMediaFeedback("UNMUTED");
+      }
+    }
+
+    function handleMediaAction(action) {
+      if (!isBluetoothConnected) return;
+      showMediaFeedback(`${action} TRIGGERED`);
+    }
+
+    /* ==================== 4. 放平姿态：语音便签与 TF 卡逻辑 ==================== */
+    let isTfCardInserted = true;
+    const tfMemoFiles = [
+      { name: 'MEMO_01.WAV', duration: 18, total: 30, progress: 60 },
+      { name: 'MEMO_02.WAV', duration: 25, total: 30, progress: 83 },
+      { name: 'MEMO_03.WAV', duration: 9, total: 30, progress: 30 }
+    ];
+    let ramMemoFile = { name: 'MEMO_RAM.WAV', duration: 12, total: 30, progress: 40 };
+
+    let currentFileIndex = 0;
+    let isMemoRecording = false;
+    let isMemoPlaying = false;
+    let deleteConfirmPending = false;
+    let memoPlayInterval = null;
+    let memoRecInterval = null;
+    let memoRecSeconds = 0;
+
+    const memoFilenameEl = document.getElementById('memo-filename');
+    const memoTimeDisplay = document.getElementById('memo-time-display');
+    const memoProgressBar = document.getElementById('memo-progress-bar');
+    const memoRecBtn = document.getElementById('memo-rec-btn');
+    const memoPlayIcon = document.getElementById('memo-play-icon');
+    const memoDelBtn = document.getElementById('memo-del-btn');
+    const memoStorageBtn = document.getElementById('memo-storage-btn');
+    const folderIcon = document.getElementById('folder-icon');
+    const memoWaveformContainer = document.getElementById('memo-waveform-container');
+    const storageHardwareDot = document.getElementById('storage-hardware-dot');
+    const storageHardwareText = document.getElementById('storage-hardware-text');
+    const tfSlotIndicator = document.getElementById('tf-slot-indicator');
+    const delBtnContent = document.getElementById('del-btn-content');
+
+    function updateStorageUI() {
+      if (isTfCardInserted) {
+        memoStorageBtn.className = 'h-16 rounded-2xl ceramic-btn-primary flex items-center justify-center transition-all duration-200 cursor-pointer active:scale-90';
+        folderIcon.setAttribute('stroke', '#ffffff');
+        memoStorageBtn.setAttribute('title', 'TF卡在线（点击循环浏览便签）');
+        
+        storageHardwareDot.className = 'w-2 h-2 rounded-full dot-success';
+        storageHardwareText.textContent = 'TF卡在线';
+        tfSlotIndicator.className = 'w-1.5 h-1.5 rounded-full dot-active chip-shadow';
+      } else {
+        memoStorageBtn.className = 'h-16 rounded-2xl ceramic-btn flex items-center justify-center t-body hover-text-accent-strong transition-all duration-200 cursor-pointer active:scale-90';
+        folderIcon.setAttribute('stroke', 'currentColor');
+        memoStorageBtn.setAttribute('title', 'RAM模式（无TF卡，点击模拟插卡）');
+        
+        storageHardwareDot.className = 'w-2 h-2 rounded-full dot-warn';
+        storageHardwareText.textContent = 'RAM内部暂存';
+        tfSlotIndicator.className = 'w-1.5 h-1.5 rounded-full dot-idle';
+      }
+      updateMemoView();
+    }
+
+    function toggleTfCardSlot() {
+      resetDeleteConfirm();
+      if (isMemoRecording) return;
+      isTfCardInserted = !isTfCardInserted;
+      updateStorageUI();
+    }
+
+    function handleStorageAction() {
+      resetDeleteConfirm();
+      if (isMemoRecording) return;
+      
+      if (isTfCardInserted) {
+        currentFileIndex = (currentFileIndex + 1) % tfMemoFiles.length;
+        if (isMemoPlaying) stopMemoPlayback();
+        updateMemoView();
+        memoStorageBtn.classList.add('tap-pop');
+        setTimeout(() => memoStorageBtn.classList.remove('tap-pop'), 250);
+      } else {
+        toggleTfCardSlot();
+      }
+    }
+
+    function updateMemoView() {
+      const file = isTfCardInserted ? tfMemoFiles[currentFileIndex] : ramMemoFile;
+      memoFilenameEl.textContent = file.name;
+      memoTimeDisplay.textContent = `00:${file.duration < 10 ? '0' + file.duration : file.duration}`;
+      memoProgressBar.style.width = `${file.progress}%`;
+    }
+
+    function toggleMemoRecord() {
+      resetDeleteConfirm();
+      if (isMemoPlaying) stopMemoPlayback();
+
+      isMemoRecording = !isMemoRecording;
+      const key2Indicator = document.getElementById('key2-indicator');
+
+      if (isMemoRecording) {
+        memoWaveformContainer.classList.add('waveform-recording', 'waveform-active');
+        memoRecBtn.className = 'h-16 rounded-2xl ceramic-btn-danger flex items-center justify-center cursor-pointer active:scale-90';
+        key2Indicator.className = 'w-1.5 h-1.5 rounded-full dot-danger animate-ping';
+        memoFilenameEl.textContent = "RECORDING...";
+        memoRecSeconds = 0;
+        
+        clearInterval(memoRecInterval);
+        memoRecInterval = setInterval(() => {
+          memoRecSeconds++;
+          const formattedSec = memoRecSeconds < 10 ? '0' + memoRecSeconds : memoRecSeconds;
+          memoTimeDisplay.textContent = `00:${formattedSec}`;
+          memoProgressBar.style.width = `${Math.min(100, (memoRecSeconds / 30) * 100)}%`;
+          if (memoRecSeconds >= 30) {
+            toggleMemoRecord(); // 30秒满额自动结束
+          }
+        }, 1000);
+      } else {
+        clearInterval(memoRecInterval);
+        memoWaveformContainer.classList.remove('waveform-recording', 'waveform-active');
+        memoRecBtn.className = 'h-16 rounded-2xl ceramic-btn-primary flex items-center justify-center cursor-pointer active:scale-90';
+        key2Indicator.className = 'w-1.5 h-1.5 rounded-full dot-idle';
+        updateMemoView();
+      }
+    }
+
+    function toggleMemoPlay() {
+      resetDeleteConfirm();
+      if (isMemoRecording) return;
+
+      isMemoPlaying = !isMemoPlaying;
+
+      if (isMemoPlaying) {
+        memoPlayIcon.innerHTML = `<rect x="6" y="4" width="4" height="16" rx="1.5"></rect><rect x="14" y="4" width="4" height="16" rx="1.5"></rect>`;
+        memoWaveformContainer.classList.add('waveform-active');
+        
+        let progressStep = 0;
+        clearInterval(memoPlayInterval);
+        memoPlayInterval = setInterval(() => {
+          progressStep = (progressStep + 2) % 100;
+          memoProgressBar.style.width = `${Math.max(10, progressStep)}%`;
+        }, 150);
+      } else {
+        stopMemoPlayback();
+      }
+    }
+
+    function stopMemoPlayback() {
+      isMemoPlaying = false;
+      clearInterval(memoPlayInterval);
+      memoPlayIcon.innerHTML = `<polygon points="5 3 19 12 5 21 5 3"></polygon>`;
+      memoWaveformContainer.classList.remove('waveform-active');
+      updateMemoView();
+    }
+
+    function handleProgressBarClick(e) {
+      if (isMemoRecording) return;
+      const rect = e.currentTarget.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const percentage = Math.max(5, Math.min(100, Math.round((clickX / rect.width) * 100)));
+      memoProgressBar.style.width = `${percentage}%`;
+    }
+
+    function handleMemoDelete() {
+      if (!deleteConfirmPending) {
+        deleteConfirmPending = true;
+        memoDelBtn.className = 'h-16 rounded-2xl ceramic-btn-danger flex items-center justify-center pill-shadow cursor-pointer active:scale-90';
+        delBtnContent.innerHTML = `<span class="text-[11px] font-black tracking-tighter text-white">CONFIRM?</span>`;
+      } else {
+        if (isMemoPlaying) stopMemoPlayback();
+        resetDeleteConfirm();
+        if (isTfCardInserted) {
+          currentFileIndex = (currentFileIndex + 1) % tfMemoFiles.length;
+        }
+        updateMemoView();
+      }
+    }
+
+    function resetDeleteConfirm() {
+      deleteConfirmPending = false;
+      memoDelBtn.className = 'h-16 rounded-2xl ceramic-btn flex items-center justify-center t-body transition-all cursor-pointer active:scale-90';
+      delBtnContent.innerHTML = `
+        <svg class="w-6 h-6" fill="none" id="memo-del-icon" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.3" viewBox="0 0 24 24">
+          <path d="M3 6h18"></path>
+          <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"></path>
+          <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"></path>
+        </svg>
+      `;
+    }
+
+    /* 物理功能键 KEY2 触控联动宏 */
+    function triggerHardwareKey2() {
+      const btn = document.getElementById('hardware-key2');
+      btn.classList.add('scale-90');
+      setTimeout(() => btn.classList.remove('scale-90'), 150);
+
+      if (currentPostureIndex === 1) {
+        // 侧放：静音
+        toggleMediaMute();
+      } else if (currentPostureIndex === 2) {
+        // 放平：录音
+        toggleMemoRecord();
+      } else {
+        // 直立：POMO 启停
+        if (currentStandMode === 0) {
+          toggleTimerRunning();
+        } else if (currentStandMode === 2) {
+          toggleStopwatch();
+        } else {
+          toggleNightDisplay();
+        }
+      }
+    }
+
+    // 初始化运行
+    updatePomoDisplay();
+    updateStorageUI();
+    switchPosture(0); // 默认进入直立专注页
+    setStandMode(1);   // 默认专注页在 TIME
+</script>
+</body></html>

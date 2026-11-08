@@ -1,0 +1,83 @@
+bash: --rts: 未找到命令...
+SFBL
+Serial:c2,Chip:4,Package:3,Rev:3  Reason:00000000
+
+ \ | /
+- SiFli Corporation
+ / | \     build on Nov  5 2026, 2.5.1 build 421126d9
+ 2020 - 2022 Copyright by SiFli team
+aw32001_init ok,  time consum: 0.00 ms.
+mount /dev sucess
+[I/drv.rtc] PSCLR=0x80000100 DivAI=128 DivAF=0 B=256
+[I/drv.rtc] RTC use LXT RTC_CR=00000001
+
+[I/drv.rtc] Init RTC, wake = 0
+
+[I/drv.audprc] init 00 ADC_PATH_CFG0 0x606
+
+[I/drv.audprc] HAL_AUDPRC_Init res 0
+
+[I/drv.audcodec] HAL_AUDCODEC_Init res 0
+
+[I/drv.rgb] rgbled register success, supporting 1 LEDs
+[32m[I/TOUCH] Regist touch screen driver, probe=12028655 [0m
+[32;22m[I/FAL] Flash Abstraction Layer (V0.5.99) initialize success.[0m
+[32;22m[I/FAL] The FAL MTD NOR device (dfu) created successfully[0m
+[32;22m[I/FAL] The FAL MTD NOR device (ble) created successfully[0m
+call par CFG1(3313)
+fc 9, xtal 2000, pll 2101
+call par CFG1(3313)
+fc 7, xtal 2000, pll 1684
+
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+msh />[I/sensor] rt_sensor init success
+[32m[I/sensor.st.lsm6dsl] sensor init success[0m
+[0m[D/sensor.st.lsm6dsl] set mode to POLLING[0m
+[0m[D/sensor.st.lsm6dsl] set power normal[0m
+[0m[D/sensor.st.lsm6dsl] acce set range 2000[0m
+[0m[D/sensor.st.lsm6dsl] acce set odr 100[0m
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] using saved five-pose calibration
+[course_starter] status=未知 25:00 x=-0.530 y=0.016 z=-0.850 muted=0 recording=0
+[course_starter] status=平放 25:00 x=-0.528 y=0.014 z=-0.850 muted=0 recording=0
+[course_starter] status=左侧 25:00 x=1.057 y=0.033 z=-0.166 muted=0 recording=0
+[course_starter] status=未知 25:00 x=-0.887 y=-0.246 z=-0.573 muted=0 recording=0
+[course_starter] status=右侧 25:00 x=-0.951 y=-0.131 z=0.119 muted=0 recording=0
+[course_starter] status=平放 25:00 x=0.238 y=0.000 z=-0.892 muted=0 recording=0
+[course_starter] status=直立 25:00 x=-0.192 y=-0.980 z=0.083 muted=0 recording=0
+[course_starter] status=直立 24:59 x=-0.237 y=-0.960 z=0.062 muted=0 recording=0
+[course_starter] status=直立 24:58 x=0.499 y=-0.224 z=-0.616 muted=0 recording=0
+[course_starter] status=左侧 24:58 x=0.980 y=0.278 z=-0.028 muted=0 recording=0
+[course_starter] macro=音量加 seq=1
+[course_starter] status=右侧 24:58 x=-1.021 y=-0.069 z=-0.149 muted=0 recording=0
+[course_starter] macro=下一首 seq=2
+[course_starter] macro=麦克风静音 seq=3
+[course_starter] status=未知 24:58 x=-0.684 y=0.058 z=-0.705 muted=0 recording=0
+[course_starter] status=平放 24:58 x=-0.078 y=0.071 z=-0.960 muted=0 recording=0
+[course_starter] status=直立 24:58 x=-0.019 y=-0.859 z=-0.547 muted=0 recording=0
+[course_starter] status=直立 24:57 x=-0.024 y=-0.855 z=-0.561 muted=0 recording=0
+[course_starter] status=未知 24:56 x=-0.081 y=-0.701 z=-0.710 muted=0 recording=0
+[course_starter] status=左侧 24:56 x=0.933 y=-0.019 z=-0.333 muted=0 recording=0
+get_mic_volume = 12db
+get_mic_volume = 12db
+[I/drv.audcodec] pll config state:1, samplerate:0 
+
+get_mic_volume = 12db
+[course_starter] recording started
+[course_starter] status=未知 24:56 x=-0.140 y=-0.777 z=-0.570 muted=0 recording=1
+[course_starter] status=直立 24:56 x=-0.138 y=-0.810 z=-0.532 muted=0 recording=1
+[course_starter] status=未知 24:56 x=-0.168 y=-0.755 z=-0.588 muted=0 recording=1
+[I/drv.audcodec] bf0_audio_stop 0x401
+
+[I/drv.audcodec] audcodec close adc
+[I/drv.audcodec] bf0_audio_stop 0x401 done
+
+[I/drv.audprc] bf0_audio_stop 0x1001
+
+[I/drv.audprc] audprc close adc/dac
+[I/drv.audprc] bf0_audio_stop 0x1001 done
+
+PLL disable
+[course_starter] recording stopped: status=2 wav=10924 bytes truncated=0
+[course_starter] status=平放 24:56 x=0.278 y=-0.186 z=-0.899 muted=0 recording=0
