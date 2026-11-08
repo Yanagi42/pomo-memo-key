@@ -1,0 +1,11 @@
+# 2026-11-06 firmware build and flash record
+
+- Board: Huangshan Pai `sf32lb52-lchspi-ulp` / SF32LB52
+- SDK: SiFli SDK v2.5.1
+- Serial port: `/dev/ttyUSB0`, 1,000,000 baud
+- Build: `cd project && scons --board=sf32lb52-lchspi-ulp -j8` — exit code 0
+- Artifacts: `project/build_sf32lb52-lchspi-ulp_hcpu/main.bin`, `ftab/ftab.bin`
+- Flash command (run from `project/build_sf32lb52-lchspi-ulp_hcpu/`):
+  `sftool -p /dev/ttyUSB0 -c SF32LB52 -m nor config sftool_param.json` — exit code 0; generated JSON has `verify: true` for bootloader, main firmware, and FTAB.
+- Initial passive serial capture immediately after flashing: 12 seconds at 1,000,000 baud; captured `SFBL` only. A subsequent UART `reboot` and successful application boot are recorded in `evidence/2026-11-06-serial-reset-boot.txt`.
+- Feature acceptance: not performed. W1–W5 remain pending for user manual testing.

@@ -1,0 +1,11 @@
+TC-B7 deferred due to ambient noise
+
+Date: 2026-11-05
+Firmware: v0.4.1, SDK v2.5.1, sf32lb52-lchspi-ulp
+
+User attempted a silent recording in a dorm room. The user reports ambient room noise and correctly notes the environment may not be silent. The board generated a saved WAV:
+
+[course_starter] recording started
+[course_starter] recording stopped: status=2 wav=10924 bytes truncated=0
+
+Disposition: TC-B7 NOT PASSED. This run does not establish the all-silence boundary. Deferred until a sufficiently quiet environment is available; do not count this sample as a defect or a pass.

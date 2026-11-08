@@ -1,0 +1,30 @@
+屏幕 UI 第一条闭环验收
+
+Firmware: v0.4.2 with LVGL v8 status UI and UI state snapshot
+SDK: SiFli v2.5.1 build 421126d9
+Board: sf32lb52-lchspi-ulp
+Port: /dev/ttyUSB0, 1000000 baud
+Flash: sftool write_flash --verify passed.
+
+Configuration:
+- CONFIG_PKG_USING_LITTLEVGL2RTT=y
+- CONFIG_LVGL_V8=y
+- CONFIG_LV_USING_EXT_RESOURCE_MANAGER disabled
+- CONFIG_BSP_USING_TOUCHD disabled
+- CONFIG_RT_USING_MEMHEAP=y
+- CONFIG_RT_USING_MEMTRACE=y
+- CONFIG_RT_MAIN_THREAD_STACK_SIZE=4096
+- CONFIG_RT_MAIN_THREAD_PRIORITY=19
+- CONFIG_GUI_APP_FRAMEWORK=y
+
+Board output:
+[course_starter] capsule selftest PASS (0)
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] using saved five-pose calibration
+[course_starter] UI ready: LCD display only, no touch input
+[I/DBG] Found lcd co5300 id:331100h
+[I/DBG] display on
+[course_starter] status=未知 25:00 ...
+[course_starter] status=平放 25:00 ...
+
+The final 20-second board run completed without the LVGL semaphore assertion or IMU read failure. UI calls are confined to the independent `pomo_ui` task; the main thread publishes pose/time/recording snapshots. Visual confirmation of the rendered labels on the physical panel remains a manual observation item.

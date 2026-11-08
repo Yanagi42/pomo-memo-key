@@ -1,0 +1,44 @@
+# flash verify (exFAT build) + permission record
+
+run: 2026-11-08 14:41:55 +0800
+
+## 授权（最小临时 ACL，经 pkexec/polkit 系统弹窗授权执行成功）
+```
+$ export XDG_SESSION_ID=1 XDG_RUNTIME_DIR=/run/user/1000
+$ pkexec /usr/bin/setfacl -m u:shizuku:rw /dev/ttyUSB0
+exit=0
+$ getfacl -p /dev/ttyUSB0
+# file: /dev/ttyUSB0
+# owner: root
+# group: dialout
+user::rw-
+user:shizuku:rw-
+group::rw-
+mask::rw-
+other::---
+
+```
+
+## verify 刷写
+```
+$ cd project/build_sf32lb52-lchspi-ulp_hcpu
+$ md5sum main.bin bootloader/bootloader.bin ftab/ftab.bin
+a38b939ce9d6a3352f4d792bf05e52a9  project/build_sf32lb52-lchspi-ulp_hcpu/main.bin
+3426e1b15ec195b165c3ad7b50cbcf06  project/build_sf32lb52-lchspi-ulp_hcpu/bootloader/bootloader.bin
+4beb5f033b5362056f967a2605684146  project/build_sf32lb52-lchspi-ulp_hcpu/ftab/ftab.bin
+
+$ sftool --connect-attempts 1 -p /dev/ttyUSB0 -c SF32LB52 -m nor write_flash --verify bootloader/bootloader.bin@0x12010000 main.bin@0x12020000 ftab/ftab.bin@0x12000000
+(sftool 进度使用回车覆盖同一行，原始文件见 exfat-flash-verify.log)
+0%
+100%
+0%
+100%
+0%
+100%
+0%
+100%
+0%
+100%
+
+exit=0 (全部写/校验步骤到达 100%)
+```

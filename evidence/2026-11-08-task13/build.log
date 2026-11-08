@@ -1,0 +1,101 @@
+* Loaded runtime config ... OK
+* Loaded profile lock 'default' ... OK
+╭─────────────────────────────╮
+│ Activating SiFli-SDK v2.5.1 │
+│ profile=default             │
+╰─────────────────────────────╯
+* Resolved tool plan ... OK
+* Checking environment compatibility ... OK
+[WARN] worktree is dirty; environment export will continue because the compatibility hash is unchanged.
+[ OK ] Updated state file /home/shizuku/.sifli/sifli-sdk-env.json
+* Identified shell ... bash
+* Generating shell export script ... OK
+* Export script ... /tmp/sifli-sdk-export/sdk-env-znex7sle.sh
+
+Done! SiFli-SDK profile default is active.
+You can now run sdk.py from your project directory.
+scons: Reading SConscript files ...
+Board: sf32lb52-lchspi-ulp_hcpu
+Adding ftab subproject for chip: SF32LB52X (ptab v1/v2)
+========
+Multi-Project Info
+--------
+full_name       main.bootloader
+parent          main
+bsp_root        /home/shizuku/.sifli/SiFli-SDK/main/example/boot_loader/project/butterflmicro/ram_v2
+build_dir       build_sf32lb52-lchspi-ulp_hcpu/bootloader
+link_script     /home/shizuku/.sifli/SiFli-SDK/main/example/boot_loader/project/butterflmicro/ram_v2/link
+ptab            /home/shizuku/.sifli/SiFli-SDK/main/customer/boards/sf32lb52-lchspi-ulp/ptab.json
+embedded:       False
+--------
+full_name       main.lcpu
+parent          main
+bsp_root        /home/shizuku/.sifli/SiFli-SDK/main/example/ble/lcpu_general/project/common
+build_dir       build_sf32lb52-lchspi-ulp_hcpu/lcpu
+link_script     /home/shizuku/.sifli/SiFli-SDK/main/drivers/cmsis/sf32lb52x/Templates/gcc/lcpu/link
+ptab            /home/shizuku/.sifli/SiFli-SDK/main/customer/boards/sf32lb52-lchspi-ulp/ptab.json
+embedded:       True
+--------
+full_name       main
+parent          
+bsp_root        /home/shizuku/Project/pomo-memo-key/project
+build_dir       build_sf32lb52-lchspi-ulp_hcpu/
+link_script     /home/shizuku/.sifli/SiFli-SDK/main/drivers/cmsis/sf32lb52x/Templates/gcc/hcpu/link
+ptab            /home/shizuku/.sifli/SiFli-SDK/main/customer/boards/sf32lb52-lchspi-ulp/ptab.json
+--------
+full_name       main.ftab
+parent          main
+bsp_root        /home/shizuku/.sifli/SiFli-SDK/main/example/flash_table/sf32lb52x_common_v2
+build_dir       build_sf32lb52-lchspi-ulp_hcpu/ftab
+link_script     /home/shizuku/.sifli/SiFli-SDK/main/drivers/cmsis/sf32lb52x/Templates/gcc/hcpu/link
+ptab            /home/shizuku/.sifli/SiFli-SDK/main/customer/boards/sf32lb52-lchspi-ulp/ptab.json
+embedded:       False
+========
+scons: done reading SConscript files.
+scons: Building targets ...
+scons: building associated VariantDir targets: build_sf32lb52-lchspi-ulp_hcpu
+Generating build_sf32lb52-lchspi-ulp_hcpu/bootloader/link_copy.lds ...
+Generating build_sf32lb52-lchspi-ulp_hcpu/lcpu/link_copy.lds ...
+Building compilation database build_sf32lb52-lchspi-ulp_hcpu/bootloader/compile_commands.json
+Building compilation database build_sf32lb52-lchspi-ulp_hcpu/compile_commands.json
+Generating build_sf32lb52-lchspi-ulp_hcpu/link_copy.lds ...
+Generating build_sf32lb52-lchspi-ulp_hcpu/ftab/link_copy.lds ...
+Building compilation database build_sf32lb52-lchspi-ulp_hcpu/ftab/compile_commands.json
+Building compilation database build_sf32lb52-lchspi-ulp_hcpu/lcpu/compile_commands.json
+scons: done building targets.
+
+================================================================================
+Memory Usage Analysis
+================================================================================
+
+                                              main                              
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━
+┃ Region / Section         ┃            Total ┃             Used ┃             F
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━
+│ ROM                      │      8,388,608 B │        947,587 B │      7,441,02
+│   .text                  │        571,264 B │                  │              
+│   .rodata                │        344,455 B │                  │              
+│   other                  │            568 B │                  │              
+│ RAM                      │        523,264 B │        205,244 B │        318,02
+│   other                  │        160,000 B │                  │              
+│   .bss                   │         40,008 B │                  │              
+│   .data                  │          5,236 B │                  │              
+└──────────────────────────┴──────────────────┴──────────────────┴──────────────
+  Binary size: 896,600 B
+
+                                              lcpu                              
+┏━━━━━━━━━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━━━━━┳━━━━━━━━━━━━━━
+┃ Region / Section         ┃            Total ┃             Used ┃             F
+┡━━━━━━━━━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━━━━━╇━━━━━━━━━━━━━━
+│ ROM                      │         12,288 B │          6,709 B │          5,57
+│   .text                  │          4,784 B │                  │              
+│   .rodata                │            829 B │                  │              
+│   other                  │              8 B │                  │              
+│ RAM                      │         23,552 B │          1,872 B │         21,68
+│   other                  │          1,028 B │                  │              
+│   .bss                   │            784 B │                  │              
+│   .data                  │             60 B │                  │              
+└──────────────────────────┴──────────────────┴──────────────────┴──────────────
+  Binary size: 6,432 B
+================================================================================
+

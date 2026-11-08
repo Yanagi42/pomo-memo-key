@@ -1,0 +1,21 @@
+IMU board smoke evidence
+
+Port: /dev/ttyUSB0
+Board: sf32lb52-lchspi-ulp
+SDK: v2.5.1, build 421126d9
+Firmware: project/build_sf32lb52-lchspi-ulp_hcpu/main.bin
+Flash: sftool write_flash --verify completed successfully.
+Bus: I2C1, PA40=SCL, PA39=SDA, address 0x6A
+Sample period: 100 ms
+
+Observed serial output:
+
+[course_starter] v0.2.0 boot ok
+[course_starter] capsule selftest PASS (0)
+[I/sensor.st.lsm6dsl] sensor init success
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] accel mg x=218 y=-728 z=-632
+[course_starter] accel mg x=217 y=-725 z=-630
+[course_starter] accel mg x=219 y=-724 z=-633
+
+Result: PASS for SDK v2.5.1 build, flash, LSM6DS3TR-C-compatible sensor initialization, and 100 ms raw acceleration output. The shown stationary sample magnitude is approximately 1 g. Timer and pose calibration are not yet wired to capsule_on_accel().

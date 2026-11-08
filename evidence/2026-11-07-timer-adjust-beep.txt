@@ -1,0 +1,8 @@
+# 2026-11-07 timer alert and accelerated adjustment
+
+- Timer range is now 1–120 minutes with 1-minute granularity. `+`/`-` short click emits one 1-minute command; hold begins continuous adjustment after about 500 ms, with repeat intervals 250 ms, 120 ms, and 60 ms after 2s/4s. LVGL hold release `CLICKED` does not add a duplicate step; bounds clamp at 1 and 120.
+- Completion alert: 500 ms, higher-amplitude 1 kHz tone; local-music volume 15 is set before `audio_open`; partial/zero `audio_write` results are retried with offset; flush plus 50 ms tail delay precedes close. Alert runs in `timer_beep` worker so the timer main loop is not blocked. Pending alerts are cleared when muted or BEEP is disabled and audio output is serialized with recording/playback.
+- Host regression: `make -C capsule test` -> `ok 283 checks`.
+- Extracted source smoke harness `/tmp/pomo_timer_smoke.py --source src/main.c` passed short tap, accelerated hold, release/press-lost, normal audio, write failure, open failure, and flush failure scenarios.
+- Temporary board probe forced 1-minute expiry in both Pomodoro and Countdown modes. UART showed `timer-smoke state=3 seconds=0`, AW8155 PA start/stop, DAC unmute/mute, and `timer beep emitted` twice; this proves the timer trigger and audio driver path, not acoustic audibility.
+- Probe was removed. Final firmware built with SDK v2.5.1, verify-flashed, RTS-reset. UART showed selftest PASS, IMU/UI/BLE ready, and 25-second capture with zero I2C errors/timeouts. User must still confirm audible SPK output and long-press feel on the physical screen.

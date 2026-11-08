@@ -1,0 +1,24 @@
+Board boot smoke evidence
+
+Port: /dev/ttyUSB0 (QinHeng CH340)
+Board: sf32lb52-lchspi-ulp
+Chip: SF32LB52
+SDK: v2.5.0, build e19690d0
+Build artifact: project/build_sf32lb52-lchspi-ulp_hcpu/main.bin
+Flash command: sftool -p /dev/ttyUSB0 -c SF32LB52 -m nor write_flash --verify
+Flash result: Connected success; Downloaded successfully; Verify success for main.bin and ftab.bin.
+
+Serial capture at 1000000 baud:
+
+SFBL
+Serial:c2,Chip:4,Package:3,Rev:3  Reason:00000000
+
+[course_starter] v0.1.0 boot ok
+Hello world!
+[course_starter] capsule selftest PASS (0)
+[course_starter] rgb -> red
+[course_starter] rgb -> green
+[course_starter] rgb -> blue
+[course_starter] rgb -> red
+
+Result: PASS for board build/flash/boot smoke check and capsule_selftest. P0 hardware cases TC-B1 through TC-B9 remain unexecuted.

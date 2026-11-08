@@ -1,0 +1,4 @@
+make: 进入目录“/home/shizuku/Project/pomo-memo-key/capsule”
+./build/test_capsule
+ok 389 checks
+make: 离开目录“/home/shizuku/Project/pomo-memo-key/capsule”

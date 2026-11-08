@@ -1,0 +1,23 @@
+录音与姿态闭环实物验收
+
+固件：v0.4.0，SiFli SDK v2.5.1，sf32lb52-lchspi-ulp
+串口：/dev/ttyUSB0，1000000 baud
+
+本次五姿态标定：
+STAND      (-39,-999,-52)mg
+FACE_DOWN  (25,91,1005)mg
+SIDE_LEFT  (970,-86,19)mg
+SIDE_RIGHT (-1005,-82,55)mg
+FLAT       (-55,-32,-980)mg
+
+姿态结果：
+- 直立进入 25:00 并递减至 24:59。
+- 左侧、右侧、扣下、平放均能识别。
+- 扣下时 muted=1，平放时 muted=0。
+
+录音结果：
+- 按 KEY2 后日志出现 get_mic_volume = 12db 和 recording started。
+- 再按 KEY2 后音频设备正常停止，日志出现 audcodec close adc、audprc close adc/dac。
+- 最终日志：recording stopped: status=2 wav=80684 bytes truncated=0。
+
+结论：姿态计时、扣下静音、KEY2 录音、录音停止、WAV 生成和未截断均已观察到。status=2 对应已保存；WAV 长度为 80684 字节。后续固件使用本次五姿态数据作为默认参照，开机不再重复标定。

@@ -2,7 +2,7 @@ CC ?= gcc
 CFLAGS ?= -std=c11 -Wall -Wextra -Werror -Isrc -fsanitize=address,undefined -fno-omit-frame-pointer
 LDFLAGS ?= -fsanitize=address,undefined
 
-SRC := src/pose.c src/vad.c src/wav.c src/capsule.c src/selftest.c
+SRC := src/pose.c src/wav.c src/capsule.c src/selftest.c
 BUILD := build
 
 .PHONY: test clean
@@ -10,8 +10,8 @@ BUILD := build
 test: $(BUILD)/test_capsule
 	./$(BUILD)/test_capsule
 
-$(BUILD)/test_capsule: $(SRC) tests/test_capsule.c src/capsule.h | $(BUILD)
-	$(CC) $(CFLAGS) -o $@ tests/test_capsule.c $(SRC) $(LDFLAGS)
+$(BUILD)/test_capsule: $(SRC) test/test_capsule.c src/capsule.h | $(BUILD)
+	$(CC) $(CFLAGS) -o $@ test/test_capsule.c $(SRC) $(LDFLAGS)
 
 $(BUILD):
 	mkdir -p $(BUILD)

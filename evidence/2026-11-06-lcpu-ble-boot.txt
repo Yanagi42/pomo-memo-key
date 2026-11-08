@@ -1,0 +1,11 @@
+# 2026-11-06 LCPU BLE and I2C boot acceptance
+
+- Cause of silent BLE startup: SF32LB52 Rev 3 requires the LCPU image in RAM. The application build omitted `AddLCPU`, leaving the SDK weak no-op `lcpu_img_install`; `sifli_ble_enable()` returned but no controller booted and no `BLE_POWER_ON_IND` arrived.
+- Build fix: `project/SConstruct` now adds the SDK `lcpu_general` child image before the application build. SDK output confirms embedded `main.lcpu`; linked application has a real LCPU image. The LCPU binary was 6,432 bytes.
+- Build: `source /home/shizuku/.sifli/SiFli-SDK/main/export.sh -t gcc && scons --board=sf32lb52-lchspi-ulp -j8` completed successfully.
+- Flash: `sftool --connect-attempts 1 -p /dev/ttyUSB0 -c SF32LB52 -m nor write_flash --verify bootloader/bootloader.bin@0x12010000 main.bin@0x12020000 ftab/ftab.bin@0x12000000` returned exit code 0.
+- RTS reset booted the app; UART showed `capsule selftest PASS (0)`, `BLE_POWER_ON_IND`, HID service handle, advertising init/start result 0, and `ADV started status=0`. A concurrent `bluetoothctl` scan discovered `POMO_MEMO_HID`.
+- During the 35-second UART capture, no `i2c_stat` errors and no `i2c sem timeout` messages occurred. IMU, FT6146, and UI initialization succeeded.
+- Pairing and bonding: started persistent BlueZ NoInputNoOutput agent, removed stale device, scanned POMO_MEMO_HID, and bluetoothctl pair reported Bonded: yes, Paired: yes, ServicesResolved: yes. Discovered HID service 0x1812, report map 0x2A4B, report 0x2A4D, and HID control point. No actual media button report or control has been tested yet. Physical screen and touch were not inspected/clicked. Timer beep and microphone capture/playback were not exercised.
+- Final post-pair RTS boot (after the last source build/flash) UART showed `connected conn=0` and `link encrypted`; final 28-second capture had zero I2C errors/timeouts. HID reports and host media response were still not triggered. Detailed final evidence: `evidence/2026-11-06-final-verification.txt`.
+- Host capsule core regression: `make -C capsule test` -> `ok 163 checks`.

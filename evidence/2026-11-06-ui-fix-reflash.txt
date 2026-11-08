@@ -1,0 +1,7 @@
+# 2026-11-06 UART reflash and boot-mode check
+
+- Board: Huangshan Pai `sf32lb52-lchspi-ulp` / SF32LB52; SDK v2.5.1.
+- Port: `/dev/ttyUSB0`, CH340 (`1a86:7523`), 1,000,000 baud. Device was present but mode `0660 root:dialout` denied access to `shizuku`; a user ACL restored read/write access.
+- Flash: `sftool -p /dev/ttyUSB0 -c SF32LB52 -m nor write_flash --verify bootloader/bootloader.bin@0x12010000 main.bin@0x12020000 ftab/ftab.bin@0x12000000` returned exit code 0 with all progress steps complete.
+- After flash, 12-second UART capture returned `SFBL` only. Sending CRLF and `reboot` produced no application shell or boot logs. This is consistent with the ROM remaining in UART download mode; the physical boot-mode jumper/state has not been confirmed.
+- Result: image write and verify succeeded; application reboot/startup, I2C behavior, touch clicks, and visual layout are not yet verified on this flash.

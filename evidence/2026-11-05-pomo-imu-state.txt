@@ -1,0 +1,17 @@
+姿态计时状态机板端启动证据
+
+Port: /dev/ttyUSB0
+Board: sf32lb52-lchspi-ulp
+SDK: v2.5.1, build 421126d9
+Firmware: project/build_sf32lb52-lchspi-ulp_hcpu/main.bin
+Flash: sftool write_flash --verify completed successfully.
+
+Observed serial output:
+[course_starter] v0.3.0 boot ok
+[course_starter] capsule selftest PASS (0)
+[I/sensor.st.lsm6dsl] sensor init success
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] calibrate five poses in order; press KEY2 for each pose
+[course_starter] place STAND still, then press KEY2 to capture
+
+Result: SDK v2.5.1 firmware with IMU, KEY2 calibration entry, capsule state-machine calls, and status reporting boots successfully. Physical five-pose calibration and stand/face-down acceptance remain unexecuted.

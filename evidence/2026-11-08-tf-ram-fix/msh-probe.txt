@@ -1,0 +1,214 @@
+Serial:c2,Chip:4,Package:3,Rev:3  Reason:00000000
+
+ \ | /
+- SiFli Corporation
+ / | \     build on Nov  8 2026, 2.5.1 build 421126d9
+ 2020 - 2022 Copyright by SiFli team
+aw32001_init ok,  time consum: 0.00 ms.
+mount /dev sucess
+[BUS]spi1 probe sdcard...
+[MSD] 17 [info] SD card goto IDLE mode OK!
+[MSD] 18 [info] CMD8 response : 0x01 0x00 0x00 0x01 0xAA
+[MSD] 19 [info] Ver2.00 or later or SDHC or SDXC memory card!
+[MSD] 19 SD_V2: READ_OCR
+[MSD] 20 response:1,0,ff,80
+[MSD] 20 [info] OCR is 0x00FF8000
+[MSD] 41 SD_V2 again: READ_OCR
+[MSD] 41 [info] OCR 2nd read is 0xC0FF8000
+[MSD] 42 [info] It is SD2.0 SDHC Card!!!
+[MSD] 44 [info] CSD Version 2.0
+[MSD] 44 [info] CSD : C_SIZE : 477103
+[MSD] 45 [info] card capacity : 232.96 Gbyte
+[MSD] 45 [info] sector_count : 488554496
+[MSD] 46 [info] TRAN_SPEED=0x32 -> card_cap_hz=25000000 Hz
+[SD]msd init ok
+find sd0 ok ! 200310f8
+[I/drv.rtc] PSCLR=0x80000100 DivAI=128 DivAF=0 B=256
+[I/drv.rtc] RTC use LXT RTC_CR=00000001
+
+[I/drv.rtc] Init RTC, wake = 0
+
+[I/drv.audprc] init 00 ADC_PATH_CFG0 0x606
+
+[I/drv.audprc] HAL_AUDPRC_Init res 0
+
+[I/drv.audcodec] HAL_AUDCODEC_Init res 0
+
+[I/drv.rgb] rgbled register success, supporting 1 LEDs
+[32m[I/TOUCH] Regist touch screen driver, probe=12028a95 [0m
+[32;22m[I/FAL] Flash Abstraction Layer (V0.5.99) initialize success.[0m
+[32;22m[I/FAL] The FAL MTD NOR device (dfu) created successfully[0m
+[32;22m[I/FAL] The FAL MTD NOR device (ble) created successfully[0m
+call par CFG1(3313)
+fc 9, xtal 2000, pll 2095
+call par CFG1(3313)
+fc 7, xtal 2000, pll 1682
+
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+[pomo_hid] ble_hid_init started
+[pomo_hid] calling sifli_ble_enable
+msh />[pomo_hid] thread entry running
+[I/sensor] rt_sensor init success
+[32m[I/sensor.st.lsm6dsl] sensor init success[0m
+[0m[D/sensor.st.lsm6dsl] set mode to POLLING[0m
+[0m[D/sensor.st.lsm6dsl] set power normal[0m
+[0m[D/sensor.st.lsm6dsl] acce set range 2000[0m
+[0m[D/sensor.st.lsm6dsl] acce set odr 100[0m
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+f_mount fail with result = 13
+[course_starter] TF library RAM fallback (initial source=RAM)
+[course_starter] using saved five-pose calibration
+[I/DBG] [NONE] -> [OPENING]
+[I/DBG] open
+[I/DBG] drv_gpu opened.
+[I/DBG] HW open
+[I/DBG] Try registered LCD driver...
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+RT-Thread shell commands:
+aw32001          - aw32001 test cmd
+get_cc_volt      - get battery voltage
+apa_set_mode     - set analog pa mode
+fal              - FAL (Flash Abstraction Layer) operate.
+kvdb_assert      - kvdb_flash_assert
+kvdb_debug       - kvdb_flash_log
+snapshot_log     - snapshot log
+app_sche_print_perf_tick - Print app &subpage costed ticks
+list_app         - list all runing app
+app_exit         - exit specifed app
+app_goback       - go back current page
+app_cleanup      - cleanup all background app
+app_run          - run an app
+mp3              - mp3 commnad
+ae_log           - ae_log
+audio_data       - audio_data
+btdm_dbg         - btdm debug config
+sible            - Sifli BLE command
+cm_cmd           - cm command
+bt_rftest        - BT / BLE no signal test
+nvds             - Sifli NVDS command
+mem_usage        - mem_usage: open or close memory usage log
+fps2             - fps2: open or close fps log
+en_lv_perf_debug - Enable lvgl perfomance debug log
+perf_cfg         - perfromance log config
+app_mem          - app_mem: open or close app_mem log
+gpu_cfg          - gpu configurattion
+gif_log          - gif_log: open or close gif_log log
+sysinfo          - Show system information
+lcpu             - forward lcpu command
+pin              - pin gpio functions
+uart             - uart setting
+aprc_debug       - aprc_debug r / w idx value
+mic_gain         - mic_gain
+lcd_ctrl         - lcd control
+lcd_wreg         - lcd_wreg
+lcd_rreg         - lcd_rreg
+get_lcd_pwm_bglit - get_lcd_pwm_bglit
+drv_lcd_test     - drv lcd test
+tp_ctrl          - Touch panel driver cmd
+en_drvtp_log     - enable touch panel log
+drv_epic_cfg     - drv_epic configuration
+reboot           - Reboot System
+dbguart2jlink    - Switch debug uart to jlink
+assert           - Force assert
+pwr_ctrl         - BT TX power adjust
+regop            - Register read / write
+memtrace         - dump memory trace information
+memcheck         - check memory data
+list_mem         - list memory usage information
+list_fd          - list file descriptor
+cpdir            - cpdir src dst
+opendir          - opendir dir
+lsmatch          - lsmatch dir match_file
+delmatch         - delmatch dir match_file
+deldir           - deldir file or dir
+dirsize          - dirsize dir
+sensor_cmd       - sensor test function
+sensor_cmd_polling - Sensor polling mode test function
+sensor_cmd_int   - Sensor interrupt mode test function
+sensor_cmd_fifo  - Sensor fifo mode test function
+list_device      - list device in system
+list_timer       - list timer in system
+list_mempool     - list memory pool in system
+list_memheap     - list memory heap in system
+list_msgqueue    - list message queue in system
+list_mailbox     - list mail box in system
+list_mutex       - list mutex in system
+list_event       - list event in system
+list_sem         - list semaphore in system
+list_thread      - list thread
+version          - show RT - Thread version information
+help             - RT - Thread shell help.
+console          - Change MSH / FINSH console device.
+free             - Show the memory usage in the system.
+time             - Execute command with time.
+ps               - List threads in the system.
+echo             - echo string to file
+df               - disk free
+unmountfs        - unmount device to file system
+mountfs          - mount device to file system
+mkfs             - format disk with file system
+mkdir            - Create the DIRECTORY.
+pwd              - Print the name of the current working directory.
+cd               - Change the shell working directory.
+rm               - Remove(unlink) the FILE(s).
+cat              - Concatenate FILE(s)
+mv               - Rename SOURCE to DEST.
+cp               - Copy SOURCE to DEST.
+ls               - List information about the FILEs.
+adc              - adc function
+show_date        - get date and time or set [year month day hour min sec]
+list_date        - show date and time.
+
+msh />
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+[I/DBG] Found lcd co5300 id:331100h
+[I/DBG] HW open done.
+[I/DBG] [OPENING] -> [INITIALIZED]
+[I/DBG] open done.
+[I/DBG] drv_lcd_fb_init
+[I/DBG] drv_lcd_fb_init done.
+[32m[I/TOUCH] Open[0m
+[32m[I/TOUCH] Find touch screen driver...[0m
+[32m[I/TOUCH] Probe 12028a95[0m
+[32m[I/TOUCH] touch screen found driver  20028a74, ft6146[0m
+[32m[I/TOUCH] Opened.[0m
+[E/drv.ft6146] ft6146 id_H=64
+[E/drv.ft6146] ft6146 id_L=56
+[course_starter] RTC initialized to 2026-11-08 10:42:00
+[course_starter] UI ready: interactive timer, touch enabled by SDK input driver
+[I/DBG] Auto turn on display.
+[I/DBG] set brightness 50
+[I/DBG] display on
+[I/DBG] [INITIALIZED] -> [ON]
+le p256 nvds get 0
+le p256 nvds get 0
+app addr nvds get 1
+[pomo_hid] event BLE_POWER_ON_IND received
+act num:0
+set cmd 0x91, stop_status:0, msg_status:2
+act num:0
+set cmd 0x91, stop_status:0, msg_status:2
+act num:0
+set cmd 0x91, stop_status:0, msg_status:1
+[pomo_hid] BLE power ready; configure Just Works bonding
+[pomo_hid] service_init handle=2002d1ec
+[pomo_hid] advertising init=0
+[pomo_hid] advertising start result=0 (name=POMO_MEMO_HID)
+[pomo_hid] ADV started status=0 mode=0
+[course_starter] status=未知 25:00 x=-0.016 y=-0.007 z=-0.986 muted=0 recording=0
+[pomo_hid] connected conn=0 peer=28:d0:43:82:eb:ed intv=39
+[pomo_hid] ADV stopped reason=0 mode=0
+[course_starter] status=平放 25:00 x=-0.012 y=-0.006 z=-0.982 muted=0 recording=0
+[I/TEST.GPIO] value=0
+
+msh />[pomo_hid] link encrypted
+[I/TEST.GPIO] PIN 27, FUNC=0, VAL=0, DIG_IO_PU, GPIO_MODE_INPUT, irqhdr=/, arg=/
+msh />No such directory
+msh />total memory: 317968 used memory : 101964 maximum allocated memory: 109592
+msh />

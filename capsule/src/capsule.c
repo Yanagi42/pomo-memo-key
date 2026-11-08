@@ -9,13 +9,22 @@ static bool moved_forward(uint32_t earlier, uint32_t later)
     return (int32_t)(later - earlier) >= 0;
 }
 
+static uint32_t *active_remaining(capsule_t *box)
+{
+    return &box->remaining_ms[box->timer_mode];
+}
+
+static const uint32_t *active_remaining_const(const capsule_t *box)
+{
+    return &box->remaining_ms[box->timer_mode];
+}
+
 static void pomo_run(capsule_t *box, uint32_t now_ms, uint32_t remaining_ms)
 {
     box->pomo = CAPSULE_POMO_RUNNING;
-    box->remaining_ms = remaining_ms;
+    *active_remaining(box) = remaining_ms;
     box->remaining_at_run_ms = remaining_ms;
     box->running_since_ms = now_ms;
-    box->mute = false;
 }
 
 static void pomo_apply(capsule_t *box, uint32_t now_ms, bool pause)
@@ -25,21 +34,24 @@ static void pomo_apply(capsule_t *box, uint32_t now_ms, bool pause)
     if (!moved_forward(box->running_since_ms, now_ms)) return;
     elapsed = now_ms - box->running_since_ms;
     if (elapsed >= box->remaining_at_run_ms) {
-        box->remaining_ms = 0;
+        /* 归零是三个视图和固件共用的完成事实：消费者据此显示 00:00。 */
+        *active_remaining(box) = 0;
         box->pomo = CAPSULE_POMO_DONE;
-        if (!box->mute) box->beep_pending = true;
+        if (box->beep_enabled && !box->mute) box->beep_pending = true;
         return;
     }
-    box->remaining_ms = box->remaining_at_run_ms - elapsed;
+    *active_remaining(box) = box->remaining_at_run_ms - elapsed;
     if (pause) box->pomo = CAPSULE_POMO_PAUSED;
 }
 
 static void pomo_on_pose(capsule_t *box, capsule_pose_t pose, uint32_t now_ms)
 {
     if (pose == CAPSULE_POSE_STAND) {
+        box->mute = false;
+        if (box->stand_mode != CAPSULE_STAND_POMO) return;
         if (box->pomo == CAPSULE_POMO_RUNNING) return;
-        if (box->pomo == CAPSULE_POMO_PAUSED) pomo_run(box, now_ms, box->remaining_ms);
-        else pomo_run(box, now_ms, CAPSULE_POMO_MS);
+        if (box->pomo == CAPSULE_POMO_PAUSED) pomo_run(box, now_ms, *active_remaining(box));
+        else pomo_run(box, now_ms, box->duration_ms[box->timer_mode]);
         return;
     }
     pomo_apply(box, now_ms, true);
@@ -116,31 +128,43 @@ static void tracker_push(capsule_t *box, capsule_pose_t pose, uint32_t now_ms)
 
 static int memo_stop(capsule_t *box)
 {
-    size_t kept = 0;
-    int err;
     box->recording = false;
     if (!box->memo_used) {
-        box->memo_status = CAPSULE_MEMO_SILENCE;
+        box->memo_status = CAPSULE_MEMO_EMPTY;
         box->wav_len = 0;
         return 0;
     }
-    err = capsule_vad_trim(&box->vad, box->memo, box->memo_used, &kept);
-    if (err) {
-        box->memo_status = CAPSULE_MEMO_BAD;
-        box->wav_len = 0;
-        return -1;
-    }
-    if (!kept) {
-        box->memo_status = CAPSULE_MEMO_SILENCE;
-        box->wav_len = 0;
-        return 0;
-    }
-    if (!box->wav || capsule_wav_write(box->wav, box->wav_cap, box->memo, kept, &box->wav_len)) {
+    if (!box->wav || capsule_wav_write(box->wav, box->wav_cap, box->memo,
+                                       box->memo_used, &box->wav_len)) {
         box->memo_status = CAPSULE_MEMO_NOSPACE;
         box->wav_len = 0;
         return -1;
     }
     box->memo_status = CAPSULE_MEMO_SAVED;
+    return 0;
+}
+int capsule_record_start(capsule_t *box)
+{
+    if (!box || box->recording) return -1;
+    box->memo_used = 0;
+    box->truncated = false;
+    box->recording = true;
+    box->wav_len = 0;
+    box->memo_status = CAPSULE_MEMO_RECORDING;
+    return 0;
+}
+int capsule_record_stop(capsule_t *box)
+{
+    if (!box || !box->recording) return -1;
+    return memo_stop(box);
+}
+int capsule_memo_clear(capsule_t *box)
+{
+    if (!box || box->recording) return -1;
+    box->memo_used = 0;
+    box->truncated = false;
+    box->wav_len = 0;
+    box->memo_status = CAPSULE_MEMO_IDLE;
     return 0;
 }
 
@@ -153,9 +177,14 @@ int capsule_init(capsule_t *box, int16_t *memo_storage, size_t memo_samples, uin
     box->memo_cap = memo_samples;
     box->wav = wav_storage;
     box->wav_cap = wav_bytes;
-    box->vad = capsule_vad_default();
     box->pomo = CAPSULE_POMO_IDLE;
-    box->remaining_ms = CAPSULE_POMO_MS;
+    box->timer_mode = CAPSULE_TIMER_POMODORO;
+    box->stand_mode = CAPSULE_STAND_TIME;
+    box->duration_ms[CAPSULE_TIMER_POMODORO] = CAPSULE_POMO_MS;
+    box->duration_ms[CAPSULE_TIMER_COUNTDOWN] = 25u * 60u * 1000u;
+    box->remaining_ms[CAPSULE_TIMER_POMODORO] = box->duration_ms[CAPSULE_TIMER_POMODORO];
+    box->remaining_ms[CAPSULE_TIMER_COUNTDOWN] = box->duration_ms[CAPSULE_TIMER_COUNTDOWN];
+    box->beep_enabled = true;
     tracker_reset(box);
     return 0;
 }
@@ -199,7 +228,7 @@ void capsule_on_key_down(capsule_t *box, uint32_t now_ms)
     box->key_down_ms = now_ms;
     if (box->recording) {
         box->key_macro = false;
-        memo_stop(box);
+        capsule_record_stop(box);
         return;
     }
     if (macro_mode(box)) {
@@ -208,11 +237,7 @@ void capsule_on_key_down(capsule_t *box, uint32_t now_ms)
         return;
     }
     box->key_macro = false;
-    box->memo_used = 0;
-    box->truncated = false;
-    box->recording = true;
-    box->wav_len = 0;
-    box->memo_status = CAPSULE_MEMO_RECORDING;
+    capsule_record_start(box);
 }
 
 void capsule_on_key_up(capsule_t *box, uint32_t now_ms)
@@ -225,7 +250,7 @@ void capsule_on_key_up(capsule_t *box, uint32_t now_ms)
     box->key_macro = false;
     held = (int32_t)(now_ms - box->key_down_ms);
     if (held < 0) held = 0;
-    if ((uint32_t)held >= CAPSULE_KEY_LONG_MS) macro = CAPSULE_MACRO_MIC_MUTE;
+    if ((uint32_t)held >= CAPSULE_KEY_LONG_MS) macro = CAPSULE_MACRO_SYSTEM_MUTE;
     else if (box->key_pose == CAPSULE_POSE_SIDE_LEFT) macro = CAPSULE_MACRO_VOLUME_UP;
     else if (box->key_pose == CAPSULE_POSE_SIDE_RIGHT) macro = CAPSULE_MACRO_NEXT;
     else return;
@@ -248,12 +273,114 @@ int capsule_on_pcm(capsule_t *box, const int16_t *pcm, size_t n)
         memcpy(box->memo + box->memo_used, pcm, n * sizeof(int16_t));
         box->memo_used += n;
     }
-    if (box->truncated) memo_stop(box);
+    if (box->truncated) {
+        memo_stop(box);
+        box->memo_status = CAPSULE_MEMO_NOSPACE;
+    }
     return 0;
 }
 
 capsule_pose_t capsule_pose(const capsule_t *box) { return box ? box->stable : CAPSULE_POSE_UNKNOWN; }
 capsule_pomo_state_t capsule_timer_state(const capsule_t *box) { return box ? box->pomo : CAPSULE_POMO_IDLE; }
+capsule_timer_mode_t capsule_timer_mode(const capsule_t *box)
+{
+    return box ? box->timer_mode : CAPSULE_TIMER_POMODORO;
+}
+
+int capsule_set_timer_mode(capsule_t *box, capsule_timer_mode_t mode, uint32_t now_ms)
+{
+    bool was_running;
+    if (!box || mode < CAPSULE_TIMER_POMODORO || mode >= CAPSULE_TIMER_MODE_COUNT) return -1;
+    if (box->timer_mode == mode) return 0;
+    was_running = box->pomo == CAPSULE_POMO_RUNNING;
+    if (was_running) pomo_apply(box, now_ms, false);
+    box->timer_mode = mode;
+    if (was_running && *active_remaining(box)) {
+        pomo_run(box, now_ms, *active_remaining(box));
+    } else if (*active_remaining(box) == 0) {
+        box->pomo = CAPSULE_POMO_DONE;
+    } else if (*active_remaining(box) < box->duration_ms[box->timer_mode]) {
+        box->pomo = CAPSULE_POMO_PAUSED;
+    } else {
+        box->pomo = CAPSULE_POMO_IDLE;
+    }
+    return 0;
+}
+capsule_stand_mode_t capsule_stand_mode(const capsule_t *box)
+{
+    return box ? box->stand_mode : CAPSULE_STAND_TIME;
+}
+
+int capsule_set_stand_mode(capsule_t *box, capsule_stand_mode_t mode, uint32_t now_ms)
+{
+    if (!box || mode < CAPSULE_STAND_POMO || mode >= CAPSULE_STAND_MODE_COUNT) return -1;
+    if (box->stand_mode == mode) return 0;
+    /* Changing views is not a start command; leaving POMO does pause it. */
+    if (mode != CAPSULE_STAND_POMO) pomo_apply(box, now_ms, true);
+    box->stand_mode = mode;
+    return 0;
+}
+
+int capsule_timer_toggle(capsule_t *box, uint32_t now_ms)
+{
+    if (!box) return -1;
+    if (box->pomo == CAPSULE_POMO_RUNNING) pomo_apply(box, now_ms, true);
+    else {
+        if (box->stable != CAPSULE_POSE_STAND || box->stand_mode != CAPSULE_STAND_POMO) return -1;
+        pomo_run(box, now_ms, box->pomo == CAPSULE_POMO_PAUSED ?
+                 *active_remaining(box) : box->duration_ms[box->timer_mode]);
+    }
+    return 0;
+}
+
+int capsule_timer_reset(capsule_t *box, uint32_t now_ms)
+{
+    if (!box) return -1;
+    box->pomo = CAPSULE_POMO_IDLE;
+    *active_remaining(box) = box->duration_ms[box->timer_mode];
+    box->remaining_at_run_ms = *active_remaining(box);
+    box->running_since_ms = now_ms;
+    box->beep_pending = false;
+    return 0;
+}
+
+int capsule_set_timer_minutes(capsule_t *box, uint32_t minutes, uint32_t now_ms)
+{
+    uint32_t old_duration, new_duration, *remaining;
+    if (!box || minutes < CAPSULE_TIMER_MIN_MINUTES || minutes > CAPSULE_TIMER_MAX_MINUTES) return -1;
+    old_duration = box->duration_ms[box->timer_mode];
+    new_duration = minutes * 60u * 1000u;
+    if (box->pomo == CAPSULE_POMO_RUNNING) {
+        pomo_apply(box, now_ms, false);
+        if (box->pomo == CAPSULE_POMO_RUNNING) {
+            remaining = active_remaining(box);
+            if (new_duration >= old_duration) *remaining += new_duration - old_duration;
+            else *remaining = *remaining > old_duration - new_duration ?
+                              *remaining - (old_duration - new_duration) : 0;
+            box->duration_ms[box->timer_mode] = new_duration;
+            if (!*remaining) {
+                box->pomo = CAPSULE_POMO_DONE;
+                if (box->beep_enabled && !box->mute) box->beep_pending = true;
+            } else {
+                box->remaining_at_run_ms = *remaining;
+                box->running_since_ms = now_ms;
+            }
+            return 0;
+        }
+    }
+    box->duration_ms[box->timer_mode] = new_duration;
+    if (box->pomo == CAPSULE_POMO_IDLE || box->pomo == CAPSULE_POMO_DONE)
+        *active_remaining(box) = new_duration;
+    return 0;
+}
+
+uint32_t capsule_timer_minutes(const capsule_t *box)
+{
+    return box ? box->duration_ms[box->timer_mode] / 60000u : 0;
+}
+
+bool capsule_beep_enabled(const capsule_t *box) { return box && box->beep_enabled; }
+void capsule_set_beep_enabled(capsule_t *box, bool enabled) { if (box) box->beep_enabled = enabled; }
 bool capsule_muted(const capsule_t *box) { return box && box->mute; }
 bool capsule_desk(const capsule_t *box) { return box && box->desk; }
 bool capsule_recording(const capsule_t *box) { return box && box->recording; }
@@ -267,8 +394,8 @@ const uint8_t *capsule_wav_data(const capsule_t *box) { return box ? box->wav : 
 uint32_t capsule_show_seconds(const capsule_t *box)
 {
     if (!box || box->pomo == CAPSULE_POMO_DONE) return 0;
-    if (box->pomo == CAPSULE_POMO_IDLE) return CAPSULE_POMO_MS / 1000u;
-    return (box->remaining_ms + 999u) / 1000u;
+    if (box->pomo == CAPSULE_POMO_IDLE) return box->duration_ms[box->timer_mode] / 1000u;
+    return (*active_remaining_const(box) + 999u) / 1000u;
 }
 
 bool capsule_take_beep(capsule_t *box)

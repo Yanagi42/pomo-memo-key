@@ -1,5 +1,10 @@
 #APP specific configuration.
 config CUSTOM_MEM_MAP
-    bool 
-	select custom_mem_map
-	default y    
+    bool
+    select custom_mem_map
+    default y
+
+config POMO_TEST_10S
+    bool "Use 10-second timer for board acceptance"
+    default n
+

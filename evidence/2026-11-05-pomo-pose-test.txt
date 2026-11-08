@@ -1,0 +1,27 @@
+真实板端姿态与计时验证
+
+固件：v0.3.0，SiFli SDK v2.5.1，板型 sf32lb52-lchspi-ulp
+串口：/dev/ttyUSB0，1000000 baud
+前置：五姿态标定完成，标定值见串口日志。
+
+用户操作后的串口结果：
+
+[course_starter] status=直立 25:00 x=-0.040 y=-0.937 z=-0.009 muted=0
+[course_starter] status=直立 24:59 x=-0.083 y=-0.723 z=-0.649 muted=0
+[course_starter] status=未知 24:59 x=-0.023 y=-0.659 z=-0.721 muted=0
+[course_starter] status=平放 24:59 x=-0.107 y=-0.229 z=-0.869 muted=0
+[course_starter] status=直立 24:59 x=-0.050 y=-0.968 z=-0.360 muted=0
+[course_starter] status=直立 24:58 x=-0.113 y=-0.899 z=-0.319 muted=0
+[course_starter] status=直立 24:57 x=-0.082 y=-0.951 z=-0.338 muted=0
+[course_starter] status=平放 24:57 x=0.174 y=0.371 z=-0.776 muted=0
+[course_starter] status=扣下 24:57 x=-0.079 y=-0.046 z=1.007 muted=1
+[course_starter] status=未知 24:57 x=-0.582 y=-0.460 z=-0.555 muted=0
+[course_starter] status=平放 24:57 x=0.031 y=0.094 z=-1.001 muted=0
+[course_starter] status=直立 24:57 x=-0.347 y=-1.042 z=-0.190 muted=0
+[course_starter] status=直立 24:56 x=-0.206 y=-1.012 z=-0.233 muted=0
+[course_starter] status=直立 24:55 x=-0.199 y=-0.968 z=-0.189 muted=0
+[course_starter] status=直立 24:54 x=-0.232 y=-0.755 z=-0.367 muted=0
+[course_starter] status=直立 24:53 x=0.015 y=-0.044 z=-0.995 muted=0
+[course_starter] status=平放 24:53 x=0.016 y=-0.046 z=-0.990 muted=0
+
+结论：直立状态进入倒计时；姿态变化后仍保持剩余时间；扣下状态报告 muted=1 且剩余时间保持 24:57；平放恢复 muted=0。已验证 REQ-002 的主要直立、扣下、平放路径。快速摆动过程中出现未知，符合姿态稳定窗口设计；本次未验证未知持续 3 秒后的桌面状态清除。

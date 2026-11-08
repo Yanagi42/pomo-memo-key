@@ -1,0 +1,22 @@
+统一P0 v0.4.2启动验收
+
+Firmware: v0.4.2
+SDK: SiFli v2.5.1 build 421126d9
+Board: sf32lb52-lchspi-ulp
+Port: /dev/ttyUSB0, 1000000 baud
+Flash: sftool write_flash --verify passed.
+Host logic: make -C capsule test -> ok 179 checks.
+
+Boot output:
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] using saved five-pose calibration
+[course_starter] status=未知 25:00 x=-0.007 y=0.009 z=-0.982 muted=0 recording=0
+[course_starter] status=平放 25:00 x=-0.009 y=0.006 z=-0.984 muted=0 recording=0
+
+Integrated but not physically exercised in this run:
+- macro UART logging: volume_up/next/mic_mute labels
+- timer beep playback through audio server
+
+LVGL UI was investigated and reverted after its LCD/touch initialization reconfigured the shared I2C1 path and corrupted IMU readings. UI is deferred until bus ownership is resolved.

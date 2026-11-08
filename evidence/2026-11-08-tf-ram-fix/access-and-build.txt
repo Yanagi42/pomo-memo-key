@@ -1,0 +1,98 @@
+# 2026-11-08 TF/RAM 修复 —— 串口访问与构建事实（agent 采集）
+
+采集时间: 2026-11-08 14:25:06 +0800  主机: Linux 7.2.15-200.fc44.x86_64 x86_64
+
+## 1. 串口权限（原始输出）
+```
+$ ls -l /dev/ttyUSB0
+crw-rw----+ 1 root dialout 188, 0 Nov  8 14:09 /dev/ttyUSB0
+$ id
+uid=1000(shizuku) gid=1000(shizuku) groups=1000(shizuku),10(wheel),961(wireshark),963(docker)
+$ getent group dialout
+dialout:x:18:
+$ getfacl -p /dev/ttyUSB0
+# file: /dev/ttyUSB0
+# owner: root
+# group: dialout
+user::rw-
+group::rw-
+other::---
+
+$ udevadm info -q all -n /dev/ttyUSB0 | grep -i tag
+E: ID_PATH_TAG=pci-0000_07_00_3-usb-0_2_1_0
+E: TAGS=:systemd:
+E: CURRENT_TAGS=:systemd:
+```
+
+## 2. 打开串口失败（原始输出）
+```
+$ python3 /tmp/sercap.py 2   # 该脚本 open() 后立即 deassert RTS+DTR
+Traceback (most recent call last):
+  File "/tmp/sercap.py", line 4, in <module>
+    fd = os.open(PORT, os.O_RDWR | os.O_NOCTTY | os.O_NONBLOCK)
+PermissionError: [Errno 13] Permission denied: '/dev/ttyUSB0'
+exit=1
+```
+
+## 3. 尝试切换到 dialout 组（原始输出）
+```
+$ type sg; command -v sg; readlink -f /usr/bin/sg
+sg is a shell builtin
+sg
+/usr/bin/newgrp
+
+$ newgrp dialout </dev/null
+exit=1
+
+$ /usr/bin/newgrp dialout </dev/null
+exit=1
+
+$ sg dialout -c "id"
+ast-grep: --config is not supported by the built-in ast-grep
+```
+
+结论: 该时刻 agent 侧受 /dev/ttyUSB0 权限阻塞（raw 输出见上）：shizuku 进程属组 wheel(10)/wireshark(961)/docker(963)/1000，不在 dialout(18)；设备为 root:dialout 0660，无 user ACL，无 uaccess(udev TAGS=:systemd:)。随后经 pkexec 最小临时 ACL 解决（`pkexec /usr/bin/setfacl -m u:shizuku:rw /dev/ttyUSB0`，exit 0，仅该设备），见 `access-and-flash.txt`；之后串口采集与 sftool verify 刷写均正常。§2 的 PermissionError 是授权前的历史记录。
+
+## 4. 固件构建（含 RAM 删除补丁，TF 源码未改）
+
+RAM 补丁已由 fast 落地（`src/main.c` `UI_CMD_TF_DELETE` RAM 分支调用 `capsule_memo_clear`、`capsule/src/capsule.c` 模块内部清空、host 回归 `make -C capsule test` = 420 checks）。本次构建只验证该补丁能整机编译，未改 `src/tf_library.c`。
+
+```
+$ source /home/shizuku/.sifli/SiFli-SDK/main/export.sh -t gcc
+Done! SiFli-SDK profile default is active.
+You can now run sdk.py from your project directory.
+exit=0
+
+$ cd project && scons --board=sf32lb52-lchspi-ulp -j8     # 完整日志 /tmp/build-ram.log
+Generating build_sf32lb52-lchspi-ulp_hcpu/main.bin ...
+Generating build_sf32lb52-lchspi-ulp_hcpu/ftab/ftab.bin ...
+Generated sftool param: build_sf32lb52-lchspi-ulp_hcpu/sftool_param.json
+scons: done building targets.
+exit=0
+```
+
+内存占用（同一次构建输出）：
+
+```
+main  ROM total 8,388,608 B used 947,865 B ; RAM total 523,264 B used 205,244 B ; Binary size: 896,800 B
+lcpu  ROM total    12,288 B used   6,709 B ; RAM total  23,552 B used   1,872 B ; Binary size:   6,432 B
+```
+
+日志中 `grep -c error` = 0；仅有既有 newlib-nano `_close/_lseek/_read/_write not implemented` 与 ftab `cannot find entry symbol entry` 链接告警（v0.4.1 起的既有基线，不影响镜像生成）。
+
+## 5. 构建产物
+
+```
+$ ls -l project/build_sf32lb52-lchspi-ulp_hcpu/main.bin
+-rwxr-xr-x+ 1 shizuku shizuku 896800 Nov  8 14:22 project/build_sf32lb52-lchspi-ulp_hcpu/main.bin
+$ md5sum project/build_sf32lb52-lchspi-ulp_hcpu/main.bin
+74668e667b62735f0bb997ccf0ae60f9  project/build_sf32lb52-lchspi-ulp_hcpu/main.bin
+$ md5sum project/build_sf32lb52-lchspi-ulp_hcpu/bootloader/bootloader.bin project/build_sf32lb52-lchspi-ulp_hcpu/ftab/ftab.bin
+3426e1b15ec195b165c3ad7b50cbcf06  project/build_sf32lb52-lchspi-ulp_hcpu/bootloader/bootloader.bin
+9b1100968b632ece680479ef1836719d  project/build_sf32lb52-lchspi-ulp_hcpu/ftab/ftab.bin
+```
+
+注：以上 §4/§5 为启用 exFAT **之前**（仅 RAM 补丁）的构建。TF 根因确认后追加 `CONFIG_RT_DFS_ELM_USE_EXFAT=y` 重新构建并刷写，最终镜像 `main.bin` 902,176 B、md5 `a38b939ce9d6a3352f4d792bf05e52a9`，见 `build-exfat.log` 与 `access-and-flash.txt`；同一张卡从 `f_mount result=13` 变为挂载成功。
+
+## 6. 刷写/串口 smoke 状态
+已执行（授权后）：`access-and-flash.txt` 记录 pkexec 授权、md5、verify 刷写 exit 0；`final-boot-after-flash.txt` 记录刷写后启动 `[SD]msd init ok`、无 `f_mount fail`、`TF library ready`；`exfat-mount-ls-df.txt` / `exfat-rw-step1.txt` / `exfat-rw-step2-reboot.txt` / `exfat-probe-cleanup.txt` 记录 df、ls、自建探针文件写/读、重启持久化与仅删除自建文件的清理。屏幕实际点击与板上录音回放仍未验证（见 `summary.md` §5）。

@@ -167,56 +167,6 @@ static void test_wav(void)
     }
 }
 
-static void test_vad(void)
-{
-    capsule_vad_config_t cfg = capsule_vad_default();
-    int16_t pcm[64];
-    size_t kept = 99;
-    cfg.frame_samples = 4;
-    cfg.preroll_frames = 1;
-    cfg.hangover_frames = 1;
-    cfg.rms_threshold = 800;
-
-    memset(pcm, 0, sizeof pcm);
-    CHECK(capsule_vad_trim(&cfg, pcm, 40, &kept) == 0);
-    CHECK(kept == 0);
-
-    for (size_t i = 0; i < 40; ++i) pcm[i] = 4000;
-    CHECK(capsule_vad_trim(&cfg, pcm, 40, &kept) == 0);
-    CHECK(kept == 0);
-
-    memset(pcm, 0, sizeof pcm);
-    fill_wave(pcm + 16, 8); /* frames 4 and 5 */
-    CHECK(capsule_vad_trim(&cfg, pcm, 40, &kept) == 0);
-    CHECK(kept == 16);
-
-    cfg.preroll_frames = 0;
-    cfg.hangover_frames = 0;
-    memset(pcm, 0, sizeof pcm);
-    fill_wave(pcm, 4);
-    fill_wave(pcm + 28, 4); /* frame 7 */
-    CHECK(capsule_vad_trim(&cfg, pcm, 32, &kept) == 0);
-    CHECK(kept == 8);
-    CHECK(pcm[0] == 3000 && pcm[4] == 3000);
-
-    cfg.hangover_frames = 1;
-    memset(pcm, 0, sizeof pcm);
-    fill_wave(pcm, 4);
-    fill_wave(pcm + 8, 4);
-    CHECK(capsule_vad_trim(&cfg, pcm, 12, &kept) == 0);
-    CHECK(kept == 12);
-
-    cfg.frame_samples = 4;
-    cfg.preroll_frames = 0;
-    cfg.hangover_frames = UINT32_MAX;
-    memset(pcm, 0, sizeof pcm);
-    fill_wave(pcm, 4);
-    CHECK(capsule_vad_trim(&cfg, pcm, 12, &kept) == 0);
-    CHECK(kept == 12);
-
-    cfg.frame_samples = 1;
-    CHECK(capsule_vad_trim(&cfg, pcm, CAPSULE_VAD_MAX_FRAMES + 1, &kept) != 0);
-}
 
 static void test_timer_and_macro(void)
 {
@@ -224,7 +174,6 @@ static void test_timer_and_macro(void)
     static uint8_t wav[256];
     capsule_t box;
     uint32_t now = 0;
-    char status[96];
     CHECK(capsule_init(&box, memo, 64, wav, sizeof wav) == 0);
     CHECK(capsule_init(NULL, memo, 64, wav, sizeof wav) != 0);
     standard_refs(&box);
@@ -238,8 +187,6 @@ static void test_timer_and_macro(void)
     CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
     CHECK(capsule_show_seconds(&box) == 25u * 60u);
     CHECK(capsule_desk(&box));
-    capsule_format_status(&box, status, sizeof status);
-    CHECK(strstr(status, "直立 25:00") != NULL);
 
     capsule_on_time(&box, now + 1000);
     CHECK(capsule_show_seconds(&box) == 25u * 60u - 1u);
@@ -292,6 +239,240 @@ static void test_timer_and_macro(void)
     CHECK(capsule_show_seconds(&box) == 25u * 60u);
 }
 
+static void test_timer_minutes_presets(void)
+{
+    static int16_t memo[16];
+    static uint8_t wav[64];
+    capsule_t box;
+    CHECK(capsule_init(&box, memo, 16, wav, sizeof wav) == 0);
+    CHECK(capsule_timer_minutes(&box) == CAPSULE_POMO_MS / 60000u);
+    CHECK(capsule_show_seconds(&box) == CAPSULE_POMO_MS / 1000u);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_IDLE);
+
+    CHECK(capsule_set_timer_minutes(&box, 24, 0) == 0);
+    CHECK(capsule_timer_minutes(&box) == 24);
+    CHECK(capsule_show_seconds(&box) == 24u * 60u);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_IDLE);
+    CHECK(capsule_set_timer_minutes(&box, 26, 0) == 0);
+    CHECK(capsule_timer_minutes(&box) == 26);
+    CHECK(capsule_show_seconds(&box) == 26u * 60u);
+
+    /* 范围之外的值一律拒绝，并且不改动已选分钟数。 */
+    CHECK(capsule_set_timer_minutes(&box, 0, 0) != 0);
+    CHECK(capsule_set_timer_minutes(&box, 121, 0) != 0);
+    CHECK(capsule_timer_minutes(&box) == 26);
+    CHECK(capsule_show_seconds(&box) == 26u * 60u);
+
+    CHECK(capsule_set_timer_minutes(&box, CAPSULE_TIMER_MIN_MINUTES, 0) == 0);
+    CHECK(capsule_timer_minutes(&box) == 1);
+    CHECK(capsule_show_seconds(&box) == 60u);
+    CHECK(capsule_set_timer_minutes(&box, CAPSULE_TIMER_MAX_MINUTES, 0) == 0);
+    CHECK(capsule_timer_minutes(&box) == 120);
+    CHECK(capsule_show_seconds(&box) == 120u * 60u);
+    CHECK(capsule_set_timer_minutes(NULL, 25, 0) != 0);
+}
+
+static void test_timer_minutes_independent_modes(void)
+{
+    static int16_t memo[16];
+    static uint8_t wav[64];
+    capsule_t box;
+    uint32_t now = 0;
+    CHECK(capsule_init(&box, memo, 16, wav, sizeof wav) == 0);
+    standard_refs(&box);
+
+    CHECK(capsule_set_timer_minutes(&box, 24, 0) == 0);
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_COUNTDOWN, 0) == 0);
+    CHECK(capsule_timer_mode(&box) == CAPSULE_TIMER_COUNTDOWN);
+    CHECK(capsule_timer_minutes(&box) == 25);
+    CHECK(capsule_show_seconds(&box) == 25u * 60u);
+    CHECK(capsule_set_timer_minutes(&box, 26, 0) == 0);
+    CHECK(capsule_timer_minutes(&box) == 26);
+
+    /* 两个模式的预设各自保存。 */
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_POMODORO, 0) == 0);
+    CHECK(capsule_timer_minutes(&box) == 24);
+    CHECK(capsule_show_seconds(&box) == 24u * 60u);
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_COUNTDOWN, 0) == 0);
+    CHECK(capsule_timer_minutes(&box) == 26);
+    CHECK(capsule_show_seconds(&box) == 26u * 60u);
+
+    /* 在一个模式里跑掉的时间不影响另一个模式的剩余值。 */
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_POMODORO, now) == 0);
+    settle(&box, 0, 0, 1000, &now, 400);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    capsule_on_time(&box, now + 60u * 1000u);
+    now += 60u * 1000u;
+    CHECK(capsule_show_seconds(&box) == 24u * 60u - 60u);
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_COUNTDOWN, now) == 0);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    CHECK(capsule_show_seconds(&box) == 26u * 60u);
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_POMODORO, now) == 0);
+    CHECK(capsule_show_seconds(&box) == 24u * 60u - 60u);
+}
+
+static void test_timer_minutes_running_delta(void)
+{
+    static int16_t memo[16];
+    static uint8_t wav[64];
+    capsule_t box;
+    uint32_t now = 0;
+    CHECK(capsule_init(&box, memo, 16, wav, sizeof wav) == 0);
+    standard_refs(&box);
+    CHECK(capsule_set_timer_minutes(&box, 24, 0) == 0);
+    settle(&box, 0, 0, 1000, &now, 400);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    CHECK(capsule_timer_minutes(&box) == 24);
+    CHECK(capsule_show_seconds(&box) == 24u * 60u);
+
+    /* 运行中调高两分钟：剩余时间立刻多两分钟。 */
+    CHECK(capsule_set_timer_minutes(&box, 26, now) == 0);
+    CHECK(capsule_timer_minutes(&box) == 26);
+    CHECK(capsule_show_seconds(&box) == 26u * 60u);
+    capsule_on_time(&box, now + 60u * 1000u);
+    now += 60u * 1000u;
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    CHECK(capsule_show_seconds(&box) == 25u * 60u);
+
+    /* 运行中调低两分钟：先结算已走时间，再扣掉两分钟差值。 */
+    CHECK(capsule_set_timer_minutes(&box, 24, now) == 0);
+    CHECK(capsule_timer_minutes(&box) == 24);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    CHECK(capsule_show_seconds(&box) == 23u * 60u);
+    capsule_on_time(&box, now + 60u * 1000u);
+    now += 60u * 1000u;
+    CHECK(capsule_show_seconds(&box) == 22u * 60u);
+
+    /* 倒计时模式同样是按差值结算。 */
+    CHECK(capsule_init(&box, memo, 16, wav, sizeof wav) == 0);
+    standard_refs(&box);
+    now = 0;
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_COUNTDOWN, 0) == 0);
+    CHECK(capsule_set_timer_minutes(&box, 26, 0) == 0);
+    settle(&box, 0, 0, 1000, &now, 400);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    CHECK(capsule_show_seconds(&box) == 26u * 60u);
+    CHECK(capsule_set_timer_minutes(&box, 25, now) == 0);
+    CHECK(capsule_timer_minutes(&box) == 25);
+    CHECK(capsule_show_seconds(&box) == 25u * 60u);
+    capsule_on_time(&box, now + 60u * 1000u);
+    now += 60u * 1000u;
+    CHECK(capsule_show_seconds(&box) == 24u * 60u);
+
+    /* 调低到不足剩余时间时直接结束，并只补一声提示音。 */
+    CHECK(capsule_init(&box, memo, 16, wav, sizeof wav) == 0);
+    standard_refs(&box);
+    now = 0;
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_COUNTDOWN, 0) == 0);
+    CHECK(capsule_set_timer_minutes(&box, 5, 0) == 0);
+    settle(&box, 0, 0, 1000, &now, 400);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    capsule_on_time(&box, now + 5u * 60u * 1000u - 30u * 1000u);
+    now += 5u * 60u * 1000u - 30u * 1000u;
+    CHECK(capsule_show_seconds(&box) == 30u);
+    CHECK(capsule_set_timer_minutes(&box, 4, now) == 0);
+    CHECK(capsule_timer_minutes(&box) == 4);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_DONE);
+    CHECK(capsule_show_seconds(&box) == 0);
+    CHECK(capsule_take_beep(&box));
+    CHECK(!capsule_take_beep(&box));
+
+    /* 结束后再设分钟只改预设，已结束的状态保持到下一次姿态切换。 */
+    CHECK(capsule_set_timer_minutes(&box, 24, now) == 0);
+    CHECK(capsule_timer_minutes(&box) == 24);
+    CHECK(box.remaining_ms[CAPSULE_TIMER_COUNTDOWN] == 24u * 60u * 1000u);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_DONE);
+    CHECK(capsule_show_seconds(&box) == 0);
+}
+
+static void test_timer_minutes_expiry_beep(void)
+{
+    static int16_t memo[32];
+    static uint8_t wav[128];
+    capsule_t box;
+    uint32_t now;
+    uint32_t end;
+    uint32_t t;
+
+    /* 番茄钟用新预设自然到点：一声。 */
+    CHECK(capsule_init(&box, memo, 32, wav, sizeof wav) == 0);
+    standard_refs(&box);
+    now = 0;
+    CHECK(capsule_set_timer_minutes(&box, 24, 0) == 0);
+    settle(&box, 0, 0, 1000, &now, 400);
+    end = box.running_since_ms + 24u * 60u * 1000u;
+    capsule_on_time(&box, end - 1u);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    CHECK(!capsule_take_beep(&box));
+    capsule_on_time(&box, end);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_DONE);
+    CHECK(capsule_show_seconds(&box) == 0);
+    CHECK(capsule_take_beep(&box));
+    CHECK(!capsule_take_beep(&box));
+
+    /* 倒计时模式自然到点：一声。 */
+    CHECK(capsule_init(&box, memo, 32, wav, sizeof wav) == 0);
+    standard_refs(&box);
+    now = 0;
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_COUNTDOWN, 0) == 0);
+    CHECK(capsule_set_timer_minutes(&box, 5, 0) == 0);
+    settle(&box, 0, 0, 1000, &now, 400);
+    end = box.running_since_ms + 5u * 60u * 1000u;
+    capsule_on_time(&box, end);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_DONE);
+    CHECK(capsule_take_beep(&box));
+    CHECK(!capsule_take_beep(&box));
+
+    /* 关掉提示音时番茄钟到点静音。 */
+    CHECK(capsule_init(&box, memo, 32, wav, sizeof wav) == 0);
+    standard_refs(&box);
+    now = 0;
+    capsule_set_beep_enabled(&box, false);
+    CHECK(!capsule_beep_enabled(&box));
+    settle(&box, 0, 0, 1000, &now, 400);
+    capsule_on_time(&box, box.running_since_ms + CAPSULE_POMO_MS);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_DONE);
+    CHECK(!capsule_take_beep(&box));
+
+    /* 关掉提示音时倒计时到点静音，事后重新打开不会补响。 */
+    CHECK(capsule_init(&box, memo, 32, wav, sizeof wav) == 0);
+    standard_refs(&box);
+    now = 0;
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_COUNTDOWN, 0) == 0);
+    CHECK(capsule_set_timer_minutes(&box, 5, 0) == 0);
+    capsule_set_beep_enabled(&box, false);
+    settle(&box, 0, 0, 1000, &now, 400);
+    end = box.running_since_ms + 5u * 60u * 1000u;
+    capsule_on_time(&box, end);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_DONE);
+    CHECK(!capsule_take_beep(&box));
+    capsule_set_beep_enabled(&box, true);
+    CHECK(capsule_beep_enabled(&box));
+    CHECK(!capsule_take_beep(&box));
+
+    /* 倒计时模式面朝下到点：提示音被吞掉，翻回来也不再响。 */
+    CHECK(capsule_init(&box, memo, 32, wav, sizeof wav) == 0);
+    standard_refs(&box);
+    now = 0;
+    CHECK(capsule_set_timer_mode(&box, CAPSULE_TIMER_COUNTDOWN, 0) == 0);
+    CHECK(capsule_set_timer_minutes(&box, 5, 0) == 0);
+    settle(&box, 0, 0, 1000, &now, 400);
+    end = box.running_since_ms + 5u * 60u * 1000u;
+    for (t = end - CAPSULE_POSE_STABLE_MS; t < end; t += 100) capsule_on_accel(&box, 0, 0, -1000, t);
+    CHECK(capsule_pose(&box) == CAPSULE_POSE_STAND);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_RUNNING);
+    capsule_on_accel(&box, 0, 0, -1000, end);
+    CHECK(capsule_pose(&box) == CAPSULE_POSE_FACE_DOWN);
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_DONE);
+    CHECK(capsule_muted(&box));
+    CHECK(!capsule_take_beep(&box));
+    now = end;
+    settle(&box, 0, 1000, 0, &now, 400);
+    CHECK(!capsule_muted(&box));
+    CHECK(capsule_timer_state(&box) == CAPSULE_POMO_DONE);
+    CHECK(!capsule_take_beep(&box));
+}
+
 static void test_beep_swallowed_when_face_down(void)
 {
     static int16_t memo[32];
@@ -337,7 +518,7 @@ static void test_macro_and_pocket(void)
 
     capsule_on_key_down(&box, now + 200);
     capsule_on_key_up(&box, now + 200 + CAPSULE_KEY_LONG_MS);
-    CHECK(capsule_last_macro(&box) == CAPSULE_MACRO_MIC_MUTE);
+    CHECK(capsule_last_macro(&box) == CAPSULE_MACRO_SYSTEM_MUTE);
     CHECK(capsule_macro_seq(&box) == 2);
 
     settle(&box, -1000, 0, 0, &now, 400);
@@ -362,7 +543,7 @@ static void test_macro_and_pocket(void)
     capsule_on_key_up(&box, now + 50);
     CHECK(capsule_recording(&box));
     capsule_on_key_down(&box, now + 80);
-    CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_SILENCE);
+    CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_EMPTY);
 }
 
 static void test_record(void)
@@ -376,8 +557,6 @@ static void test_record(void)
     const int16_t *decoded = NULL;
     size_t samples = 0;
     CHECK(capsule_init(&box, memo, total, wav, sizeof wav) == 0);
-    box.vad.preroll_frames = 1;
-    box.vad.hangover_frames = 1;
     standard_refs(&box);
     settle(&box, 0, 1000, 0, &now, 400);
     CHECK(capsule_pose(&box) == CAPSULE_POSE_FLAT);
@@ -394,8 +573,9 @@ static void test_record(void)
     CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_SAVED);
     CHECK(!capsule_memo_truncated(&box));
     CHECK(capsule_wav_read(capsule_wav_data(&box), capsule_wav_length(&box), &decoded, &samples) == 0);
-    CHECK(samples == 7 * frame);
-    CHECK(decoded[frame] == 3000);
+    CHECK(samples == total);
+    CHECK(decoded[0] == 0);
+    CHECK(decoded[5 * frame] == 3000);
 
     CHECK(capsule_wav_length(&box) > 0);
     memset(pcm, 0, sizeof pcm);
@@ -405,8 +585,9 @@ static void test_record(void)
     CHECK(capsule_on_pcm(&box, pcm, total) == 0);
     capsule_on_key_up(&box, now + 350);
     capsule_on_key_down(&box, now + 400);
-    CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_SILENCE);
-    CHECK(capsule_wav_length(&box) == 0);
+    CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_SAVED);
+    CHECK(capsule_wav_read(capsule_wav_data(&box), capsule_wav_length(&box), &decoded, &samples) == 0);
+    CHECK(samples == total);
 }
 
 static void test_truncate_and_nospace(void)
@@ -418,38 +599,19 @@ static void test_truncate_and_nospace(void)
     capsule_t box;
     fill_wave(pcm, sizeof pcm / sizeof pcm[0]);
     CHECK(capsule_init(&box, memo, 64, wav, sizeof wav) == 0);
-    box.vad.frame_samples = 32;
-    box.vad.preroll_frames = 0;
-    box.vad.hangover_frames = 0;
     capsule_on_key_down(&box, 0);
     CHECK(capsule_on_pcm(&box, pcm, 200) == 0);
     CHECK(capsule_memo_truncated(&box));
     CHECK(!capsule_recording(&box));
-    CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_SAVED);
+    CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_NOSPACE);
 
     CHECK(capsule_init(&box, memo, 64, tiny, sizeof tiny) == 0);
-    box.vad.frame_samples = 32;
-    box.vad.preroll_frames = 0;
-    box.vad.hangover_frames = 0;
     capsule_on_key_down(&box, 0);
     CHECK(capsule_on_pcm(&box, pcm, 64) == 0);
     capsule_on_key_up(&box, 5);
     capsule_on_key_down(&box, 10);
     CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_NOSPACE);
 
-    {
-        static int16_t many_memo[CAPSULE_VAD_MAX_FRAMES + 1];
-        static int16_t many_pcm[CAPSULE_VAD_MAX_FRAMES + 1];
-        static uint8_t many_wav[256];
-        CHECK(capsule_init(&box, many_memo, CAPSULE_VAD_MAX_FRAMES + 1, many_wav, sizeof many_wav) == 0);
-        box.vad.frame_samples = 1;
-        capsule_on_key_down(&box, 0);
-        CHECK(capsule_on_pcm(&box, many_pcm, CAPSULE_VAD_MAX_FRAMES + 1) == 0);
-        capsule_on_key_up(&box, 5);
-        capsule_on_key_down(&box, 10);
-        CHECK(capsule_memo_status(&box) == CAPSULE_MEMO_BAD);
-        CHECK(capsule_wav_length(&box) == 0);
-    }
 }
 
 static void test_slow_and_backward(void)
@@ -511,8 +673,11 @@ int main(void)
     test_pose_map_bytes();
     test_capture();
     test_wav();
-    test_vad();
     test_timer_and_macro();
+    test_timer_minutes_presets();
+    test_timer_minutes_independent_modes();
+    test_timer_minutes_running_delta();
+    test_timer_minutes_expiry_beep();
     test_beep_swallowed_when_face_down();
     test_beep_edges();
     test_slow_and_backward();
