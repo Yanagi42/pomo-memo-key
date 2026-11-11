@@ -136,6 +136,8 @@ static volatile capsule_pose_t ui_pose_snapshot = CAPSULE_POSE_UNKNOWN;
 static volatile uint32_t ui_seconds_snapshot = CAPSULE_POMO_MS / 1000u;
 static volatile bool ui_recording_snapshot;
 static volatile bool ui_recording_persisted_snapshot;
+/* 各页面常驻录音指示（docs/07 §5）：左上角呼吸红点，不随页面滑动。 */
+static lv_obj_t *ui_rec_badge;
 enum { UI_MEDIA_CONTROL_COUNT = 6 };
 static lv_obj_t *ui_remote_buttons[2][UI_MEDIA_CONTROL_COUNT];
 static lv_obj_t *ui_remote_play_labels[2];
@@ -498,6 +500,11 @@ static void ui_start_transition(capsule_pose_t pose)
 
 static void ui_bind_active_style(lv_obj_t *obj, lv_style_t *style);
 static void ui_set_active(lv_obj_t *obj, lv_style_t *style, bool active);
+static void ui_rec_pulse_exec(void *var, int32_t opa)
+{
+    lv_obj_set_style_opa((lv_obj_t *)var, (lv_opa_t)opa, 0);
+}
+
 static void ui_init(void)
 {
     extern rt_err_t littlevgl2rtt_init(const char *name);
@@ -821,6 +828,31 @@ static void ui_init(void)
     lv_obj_clear_flag(ui_memo_delete_label, LV_OBJ_FLAG_CLICKABLE);
     lv_label_set_text(ui_memo_delete_label, LV_SYMBOL_TRASH);
     lv_obj_center(ui_memo_delete_label);
+
+    /* 各页面常驻录音指示：左上角呼吸红点（不占布局、不拦触摸），扣下熄屏时隐藏。 */
+    ui_rec_badge = lv_obj_create(lv_scr_act());
+    ui_neutral_container(ui_rec_badge);
+    lv_obj_set_size(ui_rec_badge, 14, 14);
+    lv_obj_set_style_radius(ui_rec_badge, LV_RADIUS_CIRCLE, 0);
+    lv_obj_set_style_bg_color(ui_rec_badge, lv_color_hex(0xF43F5E), 0);
+    lv_obj_set_style_bg_opa(ui_rec_badge, LV_OPA_COVER, 0);
+    lv_obj_set_style_border_width(ui_rec_badge, 2, 0);
+    lv_obj_set_style_border_color(ui_rec_badge, lv_color_hex(0xffffff), 0);
+    lv_obj_set_pos(ui_rec_badge, 6, 6);
+    lv_obj_add_flag(ui_rec_badge, LV_OBJ_FLAG_IGNORE_LAYOUT | LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(ui_rec_badge, LV_OBJ_FLAG_CLICKABLE);
+
+    {
+        lv_anim_t pulse;
+        lv_anim_init(&pulse);
+        lv_anim_set_var(&pulse, ui_rec_badge);
+        lv_anim_set_exec_cb(&pulse, ui_rec_pulse_exec);
+        lv_anim_set_values(&pulse, LV_OPA_30, LV_OPA_COVER);
+        lv_anim_set_time(&pulse, 700);
+        lv_anim_set_playback_time(&pulse, 700);
+        lv_anim_set_repeat_count(&pulse, LV_ANIM_REPEAT_INFINITE);
+        lv_anim_start(&pulse);
+    }
     {
         time_t now = time(NULL);
         struct tm *rtc_time = localtime(&now);
@@ -977,6 +1009,12 @@ static void ui_update(void)
         }
     }
     ui_stand_update();
+    if (ui_rec_badge) {
+        if (ui_recording_snapshot && !ui_page_hidden)
+            lv_obj_clear_flag(ui_rec_badge, LV_OBJ_FLAG_HIDDEN);
+        else
+            lv_obj_add_flag(ui_rec_badge, LV_OBJ_FLAG_HIDDEN);
+    }
     if (ui_display_pose == CAPSULE_POSE_FLAT) {
         uint32_t sec = 0;
         if (ui_recording_snapshot) {
