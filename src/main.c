@@ -14,6 +14,7 @@
 #include "mem_section.h"
 #include "capsule.h"
 #include "ble_hid.h"
+#include "ble_file.h"
 #include "drv_touch.h"
 #include <time.h>
 #ifdef PKG_USING_LITTLEVGL2RTT
@@ -1856,6 +1857,12 @@ static void report_status(void)
         last_seconds = seconds;
     }
 }
+/* 录音/回放期间禁止 BLE 传文件读卡，避免与 SPI1 写入冲突（回 X 9）。 */
+static bool memo_tf_busy(void)
+{
+    return capsule_recording(&capsule_box) || playback_worker_active;
+}
+
 int main(void)
 {
     rt_kprintf("\n[%s] v%s boot ok\n", APP_NAME, APP_VERSION);
@@ -1865,6 +1872,7 @@ int main(void)
                    failed ? "FAIL" : "PASS", failed);
     }
     ble_hid_init();
+    ble_file_init(memo_tf_busy);
     if (imu_init() != 0 || capsule_init_with_calibration() != 0 || key2_init() != 0)
     {
         rt_kprintf("[%s] startup blocked\n", APP_NAME);
