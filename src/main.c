@@ -140,7 +140,6 @@ static volatile bool ui_recording_persisted_snapshot;
 static lv_obj_t *ui_rec_badge;
 enum { UI_MEDIA_CONTROL_COUNT = 6 };
 static lv_obj_t *ui_remote_buttons[2][UI_MEDIA_CONTROL_COUNT];
-static lv_obj_t *ui_remote_play_labels[2];
 static lv_obj_t *ui_remote_desk_labels[2];
 static lv_obj_t *ui_remote_bt_badges[2];
 static lv_obj_t *ui_remote_bt_labels[2];
@@ -149,7 +148,6 @@ static volatile bool ui_ble_connected_snapshot;
 static volatile char ui_media_feedback_snapshot[32];
 static volatile uint32_t ui_media_feedback_expiry;
 static volatile bool ui_media_muted;
-static volatile bool ui_media_playing = true;
 
 static lv_obj_t *ui_memo_card;
 static lv_obj_t *ui_memo_filename_label;
@@ -418,16 +416,11 @@ static lv_obj_t *ui_command_button(lv_obj_t *screen, const char *text,
     lv_obj_add_style(button, &ui_button_style, 0);
     lv_obj_set_style_text_font(button, &lv_font_montserrat_16, 0);
     lv_obj_add_style(button, &ui_button_pressed_style, LV_STATE_PRESSED);
-    for (lv_obj_t *ancestor = screen; ancestor; ancestor = lv_obj_get_parent(ancestor)) {
-        if (ancestor == ui_timer_panel) {
-            lv_obj_add_event_cb(button, ui_stand_gesture_event, LV_EVENT_ALL, NULL);
-            break;
-        }
-    }
     lv_obj_set_size(button, width, height);
     lv_obj_align(button, align, x, y);
     lv_label_set_text(label, text);
     lv_obj_center(label);
+    /* 按钮上的横滑会先被当成翻页，再把这次点击吃掉。翻页交给卡片空白处。 */
     if (command_type == UI_CMD_PLUS || command_type == UI_CMD_MINUS)
         lv_obj_add_event_cb(button, ui_timer_adjust_event, LV_EVENT_ALL,
                             (void *)(uintptr_t)command_type);
@@ -576,7 +569,9 @@ static void ui_init(void)
             lv_obj_add_style(pane, &ui_surface_style, 0);
             lv_obj_set_size(pane, ui_page_width, ui_page_height - 68);
             lv_obj_set_pos(pane, i * ui_page_width, 0);
+            lv_obj_add_event_cb(pane, ui_stand_gesture_event, LV_EVENT_ALL, NULL);
             ui_stand_cards[i] = lv_obj_create(pane);
+            lv_obj_add_event_cb(ui_stand_cards[i], ui_stand_gesture_event, LV_EVENT_ALL, NULL);
             lv_obj_clear_flag(ui_stand_cards[i], LV_OBJ_FLAG_SCROLLABLE);
             lv_obj_set_scrollbar_mode(ui_stand_cards[i], LV_SCROLLBAR_MODE_OFF);
             lv_obj_set_style_pad_all(ui_stand_cards[i], 0, 0);
@@ -655,7 +650,7 @@ static void ui_init(void)
         static const char *media_labels[UI_MEDIA_CONTROL_COUNT] = {
             LV_SYMBOL_VOLUME_MID " -", LV_SYMBOL_VOLUME_MAX " +",
             LV_SYMBOL_PREV, LV_SYMBOL_NEXT,
-            LV_SYMBOL_MUTE, ""
+            LV_SYMBOL_MUTE, LV_SYMBOL_PLAY " " LV_SYMBOL_PAUSE
         };
         static const enum ui_command_type media_commands[UI_MEDIA_CONTROL_COUNT] = {
             UI_CMD_VOLUME_DOWN, UI_CMD_VOLUME_UP,
@@ -700,10 +695,6 @@ static void ui_init(void)
                     ui_bind_active_style(ui_remote_buttons[side][index], &ui_primary_style);
                 } else if (index == 5) {
                     lv_obj_add_style(ui_remote_buttons[side][index], &ui_primary_style, 0);
-                    ui_remote_play_labels[side] = lv_label_create(ui_remote_buttons[side][index]);
-                    lv_obj_clear_flag(ui_remote_play_labels[side], LV_OBJ_FLAG_CLICKABLE);
-                    lv_label_set_text(ui_remote_play_labels[side], ui_media_playing ? LV_SYMBOL_PAUSE : LV_SYMBOL_PLAY);
-                    lv_obj_center(ui_remote_play_labels[side]);
                 }
             }
 
@@ -1131,7 +1122,6 @@ static void ui_update(void)
             }
         }
         ui_set_active(ui_remote_buttons[side][4], &ui_primary_style, ui_media_muted && ui_ble_connected_snapshot);
-        lv_label_set_text(ui_remote_play_labels[side], ui_media_playing ? LV_SYMBOL_PAUSE : LV_SYMBOL_PLAY);
 
         uint32_t now = rt_tick_get_millisecond();
         int32_t remaining = (int32_t)(ui_media_feedback_expiry - now);
@@ -1542,8 +1532,7 @@ static void send_media_command(ble_hid_command_t command, const char *feedback)
         ui_media_muted = !ui_media_muted;
         feedback = ui_media_muted ? "MUTED" : "UNMUTED";
     } else if (command == BLE_HID_PLAY_PAUSE) {
-        ui_media_playing = !ui_media_playing;
-        feedback = ui_media_playing ? "PLAYING" : "PAUSED";
+        feedback = "PLAY/PAUSE";
     }
     if (feedback) {
         rt_snprintf((char *)ui_media_feedback_snapshot, sizeof ui_media_feedback_snapshot, "%s", feedback);
