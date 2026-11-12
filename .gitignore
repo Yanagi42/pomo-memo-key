@@ -76,3 +76,6 @@ Thumbs.db
 
 # 验收录音不入库（体积/隐私）：可用 tools/ble_memo_sync 重新拉取
 evidence/**/*.wav
+
+# 桌面程序拉下来的录音、转写和计时记录含语音内容，不入库
+desktop/summary_app/from_device/
