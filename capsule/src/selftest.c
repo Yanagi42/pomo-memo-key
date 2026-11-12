@@ -23,5 +23,9 @@ int capsule_selftest(void)
     if (capsule_wav_read(file, len, &out, &samples) != 0 || samples != 4 || !out || out[0] != 1) failed++;
     if (capsule_init(&box, memo, 8, wav, 43) == 0) failed++;
     if (capsule_init(&box, memo, 8, wav, sizeof wav) != 0) failed++;
+    if (capsule_set_stand_mode(&box, CAPSULE_STAND_POMO, 0) != 0) failed++;
+    if (capsule_timer_toggle(&box, 0) != 0 || capsule_timer_state(&box) != CAPSULE_POMO_RUNNING) failed++;
+    if (capsule_timer_toggle(&box, 1000) != 0 || capsule_timer_state(&box) != CAPSULE_POMO_PAUSED) failed++;
+    if (capsule_timer_toggle(&box, 2000) != 0 || capsule_timer_state(&box) != CAPSULE_POMO_RUNNING) failed++;
     return failed;
 }

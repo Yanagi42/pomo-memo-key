@@ -326,7 +326,9 @@ int capsule_timer_toggle(capsule_t *box, uint32_t now_ms)
     if (!box) return -1;
     if (box->pomo == CAPSULE_POMO_RUNNING) pomo_apply(box, now_ms, true);
     else {
-        if (box->stable != CAPSULE_POSE_STAND || box->stand_mode != CAPSULE_STAND_POMO) return -1;
+        /* 播放键在番茄钟页上就能开始或继续，不要求当前姿态是立着。
+           立着仍会自动开始；离开立姿仍会暂停。 */
+        if (box->stand_mode != CAPSULE_STAND_POMO) return -1;
         pomo_run(box, now_ms, box->pomo == CAPSULE_POMO_PAUSED ?
                  *active_remaining(box) : box->duration_ms[box->timer_mode]);
     }
