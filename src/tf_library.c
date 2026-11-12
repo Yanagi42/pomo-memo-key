@@ -180,6 +180,33 @@ void tf_library_init(uint8_t *wav_storage, size_t wav_bytes)
 
 bool tf_library_ready(void) { return tf_ready; }
 
+int tf_library_append(const char *name, const char *text)
+{
+    struct dfs_fd fd;
+    char path[TF_NAME_MAX];
+    size_t len;
+    size_t written = 0;
+    if (!tf_ready || !name || !name[0] || !text) return -1;
+    len = strlen(text);
+    if (!len) return -1;
+    rt_snprintf(path, sizeof path, "/%s", name);
+    if (dfs_file_open(&fd, path, O_WRONLY | O_CREAT) != 0) return -1;
+    if (dfs_file_lseek(&fd, fd.size) < 0) {
+        dfs_file_close(&fd);
+        return -1;
+    }
+    while (written < len) {
+        int result = dfs_file_write(&fd, text + written, len - written);
+        if (result <= 0) {
+            dfs_file_close(&fd);
+            return -1;
+        }
+        written += (size_t)result;
+    }
+    dfs_file_close(&fd);
+    return 0;
+}
+
 int tf_library_save(const uint8_t *data, size_t len)
 {
     struct dfs_fd fd;

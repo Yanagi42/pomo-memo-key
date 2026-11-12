@@ -26,6 +26,7 @@ void tf_library_init(uint8_t *wav_storage, size_t wav_bytes);
 bool tf_library_ready(void);
 bool tf_library_copy_selected(char *dst, size_t capacity);
 int tf_library_save(const uint8_t *data, size_t len);
+int tf_library_append(const char *name, const char *text);
 int tf_library_next(void);
 int tf_library_delete(void);
 int tf_library_play(void);
@@ -1655,6 +1656,26 @@ static void start_playback(void)
     }
 }
 
+static void pomo_log_event(const char *result, unsigned minutes)
+{
+    char line[64];
+    time_t now;
+    struct tm *when;
+    int len;
+    if (!result || !minutes || !tf_library_ready()) return;
+    now = time(NULL);
+    when = localtime(&now);
+    if (!when) return;
+    len = rt_snprintf(line, sizeof line, "%04d-%02d-%02d %02d:%02d %u %s\n",
+                      when->tm_year + 1900, when->tm_mon + 1, when->tm_mday,
+                      when->tm_hour, when->tm_min, minutes, result);
+    if (len <= 0) return;
+    if (tf_library_append("pomo.log", line) != 0)
+        rt_kprintf("[%s] pomo log write failed\n", APP_NAME);
+    else
+        rt_kprintf("[%s] pomo log %s", APP_NAME, line);
+}
+
 static void handle_ui_commands(void)
 {
     struct ui_command command;
@@ -1677,6 +1698,13 @@ static void handle_ui_commands(void)
             ui_timer_reset_snapshot = false;
             break;
         case UI_CMD_TIMER_RESET:
+            if (capsule_timer_state(&capsule_box) == CAPSULE_POMO_RUNNING ||
+                capsule_timer_state(&capsule_box) == CAPSULE_POMO_PAUSED) {
+                uint32_t planned = capsule_timer_minutes(&capsule_box) * 60u;
+                uint32_t left = capsule_show_seconds(&capsule_box);
+                uint32_t elapsed = planned > left ? planned - left : 0;
+                if (elapsed) pomo_log_event("stopped", (elapsed + 59u) / 60u);
+            }
             capsule_timer_reset(&capsule_box, now);
             ui_timer_reset_snapshot = true;
             beep_pending = false;
@@ -1872,6 +1900,9 @@ static void report_status(void)
         tf_delete_pending = false;
         ui_tf_delete_confirm_snapshot = false;
     }
+    if ((last_state == CAPSULE_POMO_RUNNING || last_state == CAPSULE_POMO_PAUSED) &&
+        state == CAPSULE_POMO_DONE)
+        pomo_log_event("done", capsule_timer_minutes(&capsule_box));
     if (pose != last_pose || state != last_state || seconds != last_seconds)
     {
         char status[96];

@@ -132,6 +132,7 @@ static bool ble_file_name_ok(const char *name)
     size_t n;
     int i;
     if (!name) return false;
+    if (strcmp(name, "pomo.log") == 0) return true;
     n = strlen(name);
     if (n != 12 || strncmp(name, "memo", 4) != 0) return false;
     for (i = 4; i < 8; ++i)
