@@ -73,3 +73,6 @@ Thumbs.db
 .mcp.json
 # 开发日志只留在本机。
 /docs/devlog/
+
+# 验收录音不入库（体积/隐私）：可用 tools/ble_memo_sync 重新拉取
+evidence/**/*.wav
