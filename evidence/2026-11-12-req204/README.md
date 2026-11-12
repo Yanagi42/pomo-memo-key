@@ -26,7 +26,7 @@ python tools\todo_pipeline\todo_pipeline.py --input evidence\2026-11-12-req204\1
 | 11.wav（3.92 s） | tiny / CPU int8 | “完成 这门口尝的时间报告” | 0（无触发词） |
 | memo0012.wav（30 s） | small / CPU int8 | “完整本新言報告然後” | 0（29 s 近静音） |
 
-12 条整目录也跑过（`out-all/`、`whisper-all.log`），均为 0 条待办。
+12 条整目录也跑过（`out-all/todos.md`、`whisper-all.log`），均为 0 条待办。这批旧录音的转写原文未入库。
 
 ## 4. 真实待办闭环（2026-11-12 01:05）
 
