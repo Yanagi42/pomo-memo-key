@@ -1,0 +1,115 @@
+SFBL
+Serial:c2,Chip:4,Package:3,Rev:3  Reason:00000000
+
+ \ | /
+- SiFli Corporation
+ / | \     build on Nov 12 2026, 2.5.1 build 421126d9
+ 2020 - 2022 Copyright by SiFli team
+aw32001_init ok,  time consum: 0.00 ms.
+mount /dev sucess
+[BUS]spi1 probe sdcard...
+[MSD] 17 [info] SD card goto IDLE mode OK!
+[MSD] 18 [info] CMD8 response : 0x01 0x00 0x00 0x01 0xAA
+[MSD] 19 [info] Ver2.00 or later or SDHC or SDXC memory card!
+[MSD] 19 SD_V2: READ_OCR
+[MSD] 20 response:1,0,ff,80
+[MSD] 20 [info] OCR is 0x00FF8000
+[MSD] 41 SD_V2 again: READ_OCR
+[MSD] 42 [info] OCR 2nd read is 0xC0FF8000
+[MSD] 42 [info] It is SD2.0 SDHC Card!!!
+[MSD] 44 [info] CSD Version 2.0
+[MSD] 44 [info] CSD : C_SIZE : 477103
+[MSD] 45 [info] card capacity : 232.96 Gbyte
+[MSD] 45 [info] sector_count : 488554496
+[MSD] 46 [info] TRAN_SPEED=0x32 -> card_cap_hz=25000000 Hz
+[SD]msd init ok
+find sd0 ok ! 20031568
+[I/drv.rtc] PSCLR=0x80000100 DivAI=128 DivAF=0 B=256
+[I/drv.rtc] RTC use LXT RTC_CR=00000001
+
+[I/drv.rtc] Init RTC, wake = 0
+
+[I/drv.audprc] init 00 ADC_PATH_CFG0 0x606
+
+[I/drv.audprc] HAL_AUDPRC_Init res 0
+
+[I/drv.audcodec] HAL_AUDCODEC_Init res 0
+
+[I/drv.rgb] rgbled register success, supporting 1 LEDs
+[32m[I/TOUCH] Regist touch screen driver, probe=12028a95 [0m
+[32;22m[I/FAL] Flash Abstraction Layer (V0.5.99) initialize success.[0m
+[32;22m[I/FAL] The FAL MTD NOR device (dfu) created successfully[0m
+[32;22m[I/FAL] The FAL MTD NOR device (ble) created successfully[0m
+call par CFG1(3313)
+fc 9, xtal 2000, pll 2097
+call par CFG1(3313)
+fc 7, xtal 2000, pll 1683
+
+[course_starter] v0.4.2 boot ok
+[course_starter] capsule selftest PASS (0)
+[pomo_hid] ble_hid_init started
+[pomo_hid] calling sifli_ble_enable
+[blefile] init done, waiting BLE power on
+msh />[pomo_hid] thread entry running
+[I/sensor] rt_sensor init success
+[32m[I/sensor.st.lsm6dsl] sensor init success[0m
+[0m[D/sensor.st.lsm6dsl] set mode to POLLING[0m
+[0m[D/sensor.st.lsm6dsl] set power normal[0m
+[0m[D/sensor.st.lsm6dsl] acce set range 2000[0m
+[0m[D/sensor.st.lsm6dsl] acce set odr 100[0m
+[course_starter] IMU ready: bus=i2c1 addr=0x6a sample=100ms
+[course_starter] TF library ready (initial source=TF)
+[course_starter] using saved five-pose calibration
+[I/DBG] [NONE] -> [OPENING]
+[I/DBG] open
+[I/DBG] drv_gpu opened.
+[I/DBG] HW open
+[I/DBG] Try registered LCD driver...
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+
+CO5300_ReadID 0x331100 
+[I/co5300] LCD module use CO5300 IC 
+
+[I/DBG] Found lcd co5300 id:331100h
+[I/DBG] HW open done.
+[I/DBG] [OPENING] -> [INITIALIZED]
+[I/DBG] open done.
+[I/DBG] drv_lcd_fb_init
+[I/DBG] drv_lcd_fb_init done.
+[32m[I/TOUCH] Open[0m
+[32m[I/TOUCH] Find touch screen driver...[0m
+[32m[I/TOUCH] Probe 12028a95[0m
+[32m[I/TOUCH] touch screen found driver  20028b14, ft6146[0m
+[32m[I/TOUCH] Opened.[0m
+[E/drv.ft6146] ft6146 id_H=64
+[E/drv.ft6146] ft6146 id_L=56
+[course_starter] RTC initialized to 2026-11-08 10:42:00
+[course_starter] UI ready: interactive timer, touch enabled by SDK input driver
+[I/DBG] Auto turn on display.
+[I/DBG] set brightness 50
+[I/DBG] display on
+[I/DBG] [INITIALIZED] -> [ON]
+le p256 nvds get 0
+le p256 nvds get 0
+app addr nvds get 1
+[pomo_hid] event BLE_POWER_ON_IND received
+act num:0
+set cmd 0x91, stop_status:0, msg_status:2
+act num:0
+set cmd 0x91, stop_status:0, msg_status:2
+act num:0
+set cmd 0x91, stop_status:0, msg_status:1
+[blefile] registering service...
+[blefile] service handle=2002d28c
+[blefile] svc ready (svc=c0de0001 cmd=c0de0002 data=c0de0003)
+[pomo_hid] BLE power ready; configure Just Works bonding
+[pomo_hid] service_init handle=2002d2a0
+[pomo_hid] advertising init=0
+[pomo_hid] advertising start result=0 (name=POMO_MEMO_HID)
+[pomo_hid] ADV started status=0 mode=0
+[course_starter] status=?????? 25:00 x=-0.027 y=-1.002 z=-0.094 muted=0 recording=0
+[course_starter] status=?????? 25:00 x=-0.028 y=-0.996 z=-0.100 muted=0 recording=0
+

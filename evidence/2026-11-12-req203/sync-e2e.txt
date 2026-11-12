@@ -1,0 +1,14 @@
+﻿=== selftest ===
+ok 7 checks
+=== e2e mtu 247 ===
+离线端到端：memo0000.wav 960044 B（sha256 7441e8ae1e95），MTU [247]
+  mtu=247  chunk=120 frames=8003   SHA256 一致  主机处理 3346 ms
+ok 离线端到端（列表 / 拉取 / 错误码）
+=== e2e mtu 517 ===
+离线端到端：memo0000.wav 960044 B（sha256 7441e8ae1e95），MTU [517]
+  mtu=517  chunk=192 frames=5003   SHA256 一致  主机处理 1866 ms
+ok 离线端到端（列表 / 拉取 / 错误码）
+=== e2e mtu 23 (96 KB) ===
+离线端到端：memo0000.wav 96000 B（sha256 46ba99194783），MTU [23]
+  mtu=23   chunk=8   frames=12002  SHA256 一致  主机处理 96 ms
+ok 离线端到端（列表 / 拉取 / 错误码）

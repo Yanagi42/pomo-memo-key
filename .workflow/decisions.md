@@ -72,3 +72,12 @@ leave the older entry untouched so the file stays strictly append-only).
 - **Instead of:** Fixing them in `src/main.c` before archiving the task.
 - **Because:** They are cosmetic and do not affect the media-control path the user accepted; task 15 already specifies `PLAYING`/`PAUSED` transient feedback, so the label is intended behavior and only the initial glyph direction is ambiguous.
 - **Decided by:** agent
+
+## 2026-11-12 - Board-side BLE file transfer uses a self-built GATT service
+
+- **Decided:** Implement REQ-203 on the board with a private 128-bit GATT service in `src/ble_file.c` (`c0de0001-…`, `cmd` write characteristic, `data` notify characteristic), mirroring the proven `ble_hid.c` registration/event pattern, and keep the line protocol from `docs/11` unchanged.
+- **Instead of:** Reusing the SDK serial-transmission service via `rt_ble_serial_dev_register()`, or restarting serial-transmission with BLE console enabled.
+- **Because:** `rt_ble_serial_dev_register` lives in `bf0_sibles_console.c`; enabling it moves the console onto BLE and takes away the UART used for debugging and acceptance evidence on COM5. A private service also avoids ATT-layer reassembly and leaves HID advertisement untouched.
+- **Decided by:** user (rejection of the serial-transmission path) and agent (implementation shape).
+
+
